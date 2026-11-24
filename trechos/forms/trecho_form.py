@@ -1,33 +1,11 @@
 from django import forms
 
+from comum.forms import CampoDeVariasImagens
 from trechos.models import Bairro, Classificacao, Lado, Obstaculo
 from trechos.models.escolhas import LATITUDE_MAXIMA, LATITUDE_MINIMA, LONGITUDE_MAXIMA, LONGITUDE_MINIMA
 from trechos.services.dados import DadosTrecho
 
 MAXIMO_DE_FOTOS = 5
-TAMANHO_MAXIMO_DA_FOTO = 5 * 1024 * 1024  # 5 MB
-
-
-class EntradaDeVariosArquivos(forms.ClearableFileInput):
-    allow_multiple_selected = True
-
-
-class CampoDeVariasImagens(forms.ImageField):
-    """Aceita várias imagens no mesmo campo; cada uma é validada pelo ImageField (Pillow)."""
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("widget", EntradaDeVariosArquivos(attrs={"accept": "image/*"}))
-        super().__init__(*args, **kwargs)
-
-    def clean(self, data, initial=None):
-        arquivos = data if isinstance(data, (list, tuple)) else [data]
-        arquivos = [arquivo for arquivo in arquivos if arquivo]
-        if len(arquivos) > MAXIMO_DE_FOTOS:
-            raise forms.ValidationError(f"Envie no máximo {MAXIMO_DE_FOTOS} fotos.")
-        for arquivo in arquivos:
-            if arquivo.size > TAMANHO_MAXIMO_DA_FOTO:
-                raise forms.ValidationError(f"A foto '{arquivo.name}' passa de 5 MB.")
-        return [super(CampoDeVariasImagens, self).clean(arquivo, initial) for arquivo in arquivos]
 
 
 def _coordenada(rotulo: str, minimo, maximo) -> forms.DecimalField:
@@ -69,6 +47,7 @@ class TrechoForm(forms.Form):
         label="Observações", max_length=500, required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
     fotos = CampoDeVariasImagens(
+        maximo_de_arquivos=MAXIMO_DE_FOTOS,
         label="Fotos", required=False, help_text="Até 5 imagens, de até 5 MB cada. São públicas."
     )
 

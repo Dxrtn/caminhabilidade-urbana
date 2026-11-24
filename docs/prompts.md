@@ -248,3 +248,29 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** a causa não era a localização. A política de uso dos tiles do OpenStreetMap bloqueia navegadores que não enviam `Referer`, e o Django usa `SECURE_REFERRER_POLICY = "same-origin"` no site todo. Corrigido só na camada de tiles, com `referrerPolicy: "strict-origin-when-cross-origin"` em `static/js/mapa.js` e `static/js/trecho_form.js` (o navegador envia apenas a origem, sem o caminho).
 
 **Revisão da dupla:** mapa conferido no navegador por Davi, funcionando.
+
+### 011 — 2026-11-24 — Implementação da spec 0006 (feedbacks)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0006
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0006-feedbacks.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Pontos de atenção:
+> - Ligue o botão "Enviar feedback" no detalhe do trecho (spec 0005). Visitante sem login deve ir para o login com next.
+> - Registre o context processor de notificações em settings.py e mostre a contagem ao lado de "Meus feedbacks" no base.html.
+> - Nos testes, use MEDIA_ROOT temporário para não deixar imagens na pasta do projeto.
+> - As regras de negócio (limite diário, 1 em análise por trecho, "Novo problema" exige foto e obstáculo)
+>   ficam no FeedbackService. A constraint uq_feedback_um_em_analise_por_trecho do banco continua como garantia,
+>   e o IntegrityError dela deve virar FeedbackEmAnaliseExistente.
+>
+> Marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** exceções de feedbacks; `FeedbackService` (verificações na ordem da spec, distância por Haversine sem guardar a posição, `IntegrityError` da constraint convertido pelo nome em `FeedbackEmAnaliseExistente`, exclusão das fotos do disco só após o commit) e `NotificacaoService`; context processor com o contador no menu; `FeedbackForm` com câmera no celular; views de envio, "Meus feedbacks" e exclusão; botão "Enviar feedback" no detalhe. `CampoDeVariasImagens` passou para `comum/forms.py`, com limite configurável. 26 testes novos (114 no total), com `MEDIA_ROOT` temporário.
+
+**Revisão da dupla:** *(preencher)*

@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0005). Os demais caminhos ainda são planejados.
+Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0006). Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -28,8 +28,8 @@ Reaproveitar e especializar comportamento a partir de uma classe base.
 | `AdministradorRequeridoMixin` | `LoginRequiredMixin` e `UserPassesTestMixin` | Herança múltipla: exige login **e** `is_staff`. Sobrescreve só `test_func()`; pela ordem de resolução (MRO), o login é verificado primeiro | `comum/mixins.py` ✔ |
 | Todas as views | `django.views.View` | O despacho por método HTTP. Já existem `CadastroView`, `VerificarCelularView`, `ReenviarCodigoView`, `EntrarView`, `SairView` (com `LoginRequiredMixin`) e a `MapaView` provisória; o teste `comum/tests/test_arquitetura.py` garante a regra | `contas/views/` ✔, `trechos/views/` ✔, `feedbacks/views/` |
 | `EntrarForm` | `AuthenticationForm` (Django) | Autenticação e mensagens de erro; sobrescreve `clean_username()` e o rótulo "E-mail" | `contas/forms/entrar.py` ✔ |
-| Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app, cada filha sobrescrevendo só o atributo `mensagem`. Em contas: `EmailJaCadastrado`, `CelularJaCadastrado`, `CodigoInvalido`, `CodigoExpirado`, `LimiteDeReenvioAtingido` e `UsuarioNaoEncontrado`. Em trechos: `TrechoNaoEncontrado`, `TrechoDuplicado` e `DadosDeTrechoInvalidos` | `contas/exceptions.py` ✔, `trechos/exceptions.py` ✔, `feedbacks/` |
-| `CampoDeVariasImagens` | `forms.ImageField` (Django) | A validação de imagem com Pillow; sobrescreve `clean()` para aceitar até 5 arquivos e validar cada um com o `clean()` da classe base | `trechos/forms/trecho_form.py` ✔ |
+| Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app, cada filha sobrescrevendo só o atributo `mensagem`. Em contas: `EmailJaCadastrado`, `CelularJaCadastrado`, `CodigoInvalido`, `CodigoExpirado`, `LimiteDeReenvioAtingido` e `UsuarioNaoEncontrado`. Em trechos: `TrechoNaoEncontrado`, `TrechoDuplicado`, `DadosDeTrechoInvalidos` e `TextoDeBuscaCurto`. Em feedbacks: `LimiteDiarioAtingido`, `FeedbackEmAnaliseExistente`, `FeedbackIncompleto`, `FotosEmExcesso`, `FeedbackNaoEncontrado` e `FeedbackNaoPodeSerExcluido` | `contas/exceptions.py` ✔, `trechos/exceptions.py` ✔, `feedbacks/exceptions.py` ✔ |
+| `CampoDeVariasImagens` | `forms.ImageField` (Django) | A validação de imagem com Pillow; sobrescreve `__init__` (limite de arquivos configurável) e `clean()`, que valida cada arquivo com o `clean()` da classe base. Usado pelo formulário de trecho (até 5) e pelo de feedback (limite no service) | `comum/forms.py` ✔ |
 
 ## Polimorfismo
 
@@ -42,7 +42,7 @@ O mesmo comando produz comportamentos diferentes conforme o objeto que o recebe.
 | `importador.importar()` | Lê da lista de exemplo ou de um CSV. O comando `carregar_trechos` escolhe a subclasse e chama `importar()` sem saber qual é a origem | `trechos/management/commands/carregar_trechos.py` ✔ |
 | `ler()` sobrescrito | Cada importador implementa a leitura da sua origem, e o `importar()` da classe base a chama (*Template Method*). O mesmo vale para `_posicao()`: "item 3" no exemplo, "linha 3" no CSV | `trechos/services/importadores.py` ✔ |
 | `except (TrechoDuplicado, DadosDeTrechoInvalidos) as exc` | Uma cláusula trata os dois erros do formulário de trecho, e `str(exc)` mostra a mensagem de cada um | `trechos/views/painel.py` ✔ |
-| `except FeedbackErro` | Uma única cláusula trata qualquer erro de feedback, cada um com sua mensagem | `feedbacks/views/` |
+| `except FeedbackErro as exc` | Uma única cláusula trata qualquer erro de feedback (limite diário, em análise, incompleto, fotos em excesso), e `str(exc)` mostra a mensagem própria de cada um | `feedbacks/views/feedbacks.py` ✔ |
 
 ## Encapsulamento
 
@@ -50,11 +50,11 @@ Proteger o estado e as regras, expondo só uma interface pública.
 
 | Onde | Como |
 |---|---|
-| Services | As views só chamam métodos públicos como `CadastroService.cadastrar(...)` ✔ e `FeedbackService.enviar(...)`; a geração do código, o limite de reenvios e a transação ficam escondidos dentro do service (`contas/services/`) |
+| Services | As views só chamam métodos públicos como `CadastroService.cadastrar(...)` ✔ e `FeedbackService.enviar(...)` ✔; a geração do código, o limite de reenvios, o limite diário, a regra de distância e a transação ficam escondidos dentro dos services (`contas/services/`, `feedbacks/services/`), em métodos internos como `_enviados_hoje()`, `_tem_em_analise()` e `_esta_longe()` |
 | `ImportadorDeTrechos._administrador` ✔ | Atributo protegido, definido no construtor e usado só pela própria classe e subclasses; o mesmo para `_resultado` e, no `ImportadorCsv`, `_caminho` e `_linha` |
 | `TrechoService` ✔ | As views do painel só chamam `criar`, `atualizar`, `desativar` etc.; a resolução do bairro, a verificação de duplicidade, a transação e o `select_for_update` ficam em métodos `_` internos (`_validar`, `_existe_igual`, `_obter_para_alterar`, `_definir_obstaculos`) |
 | Métodos auxiliares com `_` | Ex.: `VerificacaoService._gerar_codigo()` ✔ e `CadastroService._garantir_disponivel()` ✔, de uso interno do service; `_distancia_ate_trecho()` (planejado) |
-| Exceções de domínio | O service comunica falhas sem expor detalhes do banco. Em `CadastroService.cadastrar` ✔, o `IntegrityError` de um cadastro simultâneo vira `EmailJaCadastrado` ou `CelularJaCadastrado`; no feedback, vira `FeedbackEmAnaliseExistente` (planejado) |
+| Exceções de domínio | O service comunica falhas sem expor detalhes do banco. Em `CadastroService.cadastrar` ✔, o `IntegrityError` de um cadastro simultâneo vira `EmailJaCadastrado` ou `CelularJaCadastrado`; em `FeedbackService.enviar` ✔, o `IntegrityError` da constraint `uq_feedback_um_em_analise_por_trecho` vira `FeedbackEmAnaliseExistente` |
 | `HistoricoTrecho` ✔ | Só a trigger `trg_trecho_historico` grava (`trechos/migrations/0003_trigger_historico_trecho.py`); no Admin é somente leitura, e nenhum service escreve nela |
 | `TrechoMapa` ✔ | Lê a view `vw_trechos_mapa` com `managed = False`; `save()` e `delete()` são sobrescritos para levantar `NotSupportedError`, então o objeto não pode ser gravado (`trechos/models/trecho_mapa.py`) |
 | `DadosTrecho` (`frozen=True`) ✔ | Objeto de dados imutável: depois de criado, não pode ser alterado (`trechos/services/dados.py`). O form e os importadores o criam, e o `TrechoService` só o lê |

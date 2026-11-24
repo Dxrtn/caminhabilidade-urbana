@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meus feedbacks — Caminhabilidade Urbana{% endblock %}
+
+{% block content %}
+  <h1>Meus feedbacks</h1>
+
+  {% if notificacoes %}
+    <section aria-labelledby="titulo-notificacoes" class="notificacoes">
+      <h2 id="titulo-notificacoes">Notificações</h2>
+      <ul>
+        {% for notificacao in notificacoes %}
+          <li class="notificacao{% if not notificacao.lida %} notificacao--nova{% endif %}">
+            {% if not notificacao.lida %}<strong>Nova:</strong> {% endif %}{{ notificacao.mensagem }}
+            <small>· {{ notificacao.criado_em|date:"d/m/Y H:i" }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section aria-labelledby="titulo-lista">
+    <h2 id="titulo-lista">Enviados</h2>
+    {% if pagina.object_list %}
+      <ul class="lista-feedbacks">
+        {% for feedback in pagina %}
+          <li class="cartao-feedback">
+            <p>
+              <a href="{% url 'trechos:detalhe' feedback.trecho_id %}"><strong>{{ feedback.trecho.logradouro }}</strong></a><br>
+              <small>{{ feedback.criado_em|date:"d/m/Y H:i" }} · {{ feedback.get_tipo_display }}</small>
+            </p>
+            <p>Status: <strong>{{ feedback.get_status_display }}</strong></p>
+            {% if feedback.status == "REJEITADO" %}
+              <p>Motivo: {{ feedback.get_motivo_rejeicao_display }}{% if feedback.motivo_rejeicao_texto %} — {{ feedback.motivo_rejeicao_texto }}{% endif %}</p>
+            {% endif %}
+            <p class="cartao-feedback__descricao">{{ feedback.descricao }}</p>
+            {% if feedback.status == "EM_ANALISE" %}
+              <form method="post" action="{% url 'feedbacks:excluir' feedback.pk %}"
+                    data-confirmar="Excluir este feedback? Esta ação não pode ser desfeita.">
+                {% csrf_token %}
+                <button type="submit" class="botao--secundario">Excluir</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if pagina.has_other_pages %}
+        <nav class="paginacao" aria-label="Páginas">
+          {% if pagina.has_previous %}<a href="?pagina={{ pagina.previous_page_number }}">← Anterior</a>{% endif %}
+          <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+          {% if pagina.has_next %}<a href="?pagina={{ pagina.next_page_number }}">Próxima →</a>{% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <p>Você ainda não enviou feedbacks. Escolha um trecho no <a href="{% url 'trechos:mapa' %}">mapa</a>.</p>
+    {% endif %}
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/confirmar.js' %}"></script>
+{% endblock %}

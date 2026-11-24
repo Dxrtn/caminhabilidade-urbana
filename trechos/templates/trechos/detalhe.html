@@ -31,7 +31,13 @@
       <button type="button" id="ouvir" class="botao" hidden
               data-texto-voz="{{ trecho.logradouro }}, entre {{ trecho.referencia_inicio }} e {{ trecho.referencia_fim }}, {{ trecho.get_lado_display|lower }}. Classificação: {{ trecho.get_classificacao_display|lower }}. Obstáculos: {% for obstaculo in detalhe.obstaculos %}{{ obstaculo.nome|lower }}{% if forloop.revcounter == 2 %} e {% elif not forloop.last %}, {% endif %}{% empty %}nenhum{% endfor %}. Atualizado em {{ trecho.atualizado_em|date:'j \d\e F \d\e Y'|lower }}.">Ouvir</button>
       <button type="button" id="parar-voz" class="botao--secundario" hidden>Parar</button>
-      {# "Enviar feedback" entra na spec 0006. #}
+      {% url 'feedbacks:enviar' trecho.pk as url_enviar %}
+      {% if user.is_authenticated %}
+        <a class="botao" href="{{ url_enviar }}">Enviar feedback</a>
+      {% else %}
+        {# Visitante vai direto ao login e volta ao formulário depois de entrar. #}
+        <a class="botao" href="{% url 'contas:entrar' %}?next={{ url_enviar|urlencode }}">Enviar feedback</a>
+      {% endif %}
       <a class="botao botao--secundario" href="{% url 'trechos:mapa' %}?trecho={{ trecho.pk }}">Voltar ao mapa</a>
     </div>
 

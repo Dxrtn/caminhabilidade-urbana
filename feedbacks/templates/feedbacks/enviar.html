@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Enviar feedback — {{ trecho.logradouro }}{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'trechos:detalhe' trecho.pk %}">← Voltar ao trecho</a></p>
+  <h1>Enviar feedback</h1>
+  <p class="trecho-alvo">
+    <strong>{{ trecho.logradouro }}</strong> — {{ trecho.bairro }}<br>
+    <small>{{ trecho.referencia_inicio }} → {{ trecho.referencia_fim }} ({{ trecho.get_lado_display }})</small>
+  </p>
+
+  <p class="aviso" id="aviso-localizacao">
+    Sua localização é usada apenas para conferir se você está perto do trecho e não é guardada.
+  </p>
+
+  <form method="post" enctype="multipart/form-data" class="formulario" novalidate
+        action="{% url 'feedbacks:enviar' trecho.pk %}">
+    {% csrf_token %}
+    {{ form }}
+    <p id="status-localizacao" class="helptext" role="status" aria-live="polite"></p>
+    <button type="submit">Enviar feedback</button>
+  </form>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/feedback_form.js' %}"></script>
+{% endblock %}

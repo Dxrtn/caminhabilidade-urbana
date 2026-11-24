@@ -1,6 +1,6 @@
 # Spec 0006: Envio e acompanhamento de feedbacks
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-18 a RF-26 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0001](../adr/0001-mvt-com-camada-de-service.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0002](0002-contas.md), [Spec 0005](0005-mapa-e-detalhes.md)
@@ -45,7 +45,7 @@ Um *context processor* (`feedbacks/context_processors.py`) chama `contar_nao_lid
 - `obstaculos`: checkboxes com o catálogo.
 - `classificacao_sugerida`: select opcional, só com as três classificações avaliadas.
 - `descricao`: textarea de 10 a 500 caracteres, com contador de caracteres em JavaScript.
-- `fotos`: seleção múltipla, `accept="image/*"` e `capture="environment"` (abre a câmera no celular); cada imagem validada pelo Pillow, até 5 MB.
+- `fotos`: seleção múltipla, `accept="image/*"` e `capture="environment"` (abre a câmera no celular); cada imagem validada pelo Pillow, até 5 MB. Usa `comum.forms.CampoDeVariasImagens`, o mesmo campo do formulário de trecho, sem limite de quantidade no form: o limite de 3 é do service (`FotosEmExcesso`).
 - `latitude` e `longitude`: campos ocultos, preenchidos por JavaScript apenas se o usuário permitir a localização.
 
 A validação de "Novo problema exige obstáculo e foto" fica no service; o form só valida formato.
@@ -81,22 +81,22 @@ A validação de "Novo problema exige obstáculo e foto" fica no service; o form
 
 ### Service
 
-- [ ] `enviar` cria o feedback em análise com obstáculos e fotos e não altera a classificação do trecho.
-- [ ] "Novo problema" sem foto ou sem obstáculo levanta `FeedbackIncompleto`.
-- [ ] O 11º feedback do dia levanta `LimiteDiarioAtingido`.
-- [ ] Um segundo feedback em análise no mesmo trecho levanta `FeedbackEmAnaliseExistente`.
-- [ ] Mais de 3 fotos levanta `FotosEmExcesso`.
-- [ ] Posição a mais de 200 m marca `enviado_a_distancia`; a menos de 200 m ou sem posição, não. Nenhum campo guarda a posição.
-- [ ] Feedback para trecho inativo levanta `TrechoNaoEncontrado`.
-- [ ] `excluir` funciona para o dono em análise, levanta `FeedbackNaoEncontrado` para outro usuário e `FeedbackNaoPodeSerExcluido` para feedback já analisado.
-- [ ] `NotificacaoService` conta e marca notificações como lidas.
+- [x] `enviar` cria o feedback em análise com obstáculos e fotos e não altera a classificação do trecho.
+- [x] "Novo problema" sem foto ou sem obstáculo levanta `FeedbackIncompleto`.
+- [x] O 11º feedback do dia levanta `LimiteDiarioAtingido`.
+- [x] Um segundo feedback em análise no mesmo trecho levanta `FeedbackEmAnaliseExistente`.
+- [x] Mais de 3 fotos levanta `FotosEmExcesso`.
+- [x] Posição a mais de 200 m marca `enviado_a_distancia`; a menos de 200 m ou sem posição, não. Nenhum campo guarda a posição.
+- [x] Feedback para trecho inativo levanta `TrechoNaoEncontrado`.
+- [x] `excluir` funciona para o dono em análise, levanta `FeedbackNaoEncontrado` para outro usuário e `FeedbackNaoPodeSerExcluido` para feedback já analisado.
+- [x] `NotificacaoService` conta e marca notificações como lidas.
 
 ### Views
 
-- [ ] Visitante é redirecionado ao login ao abrir o formulário e ao abrir "Meus feedbacks".
-- [ ] Envio válido com imagem de teste (gerada pelo Pillow em memória) redireciona para o detalhe com a mensagem.
-- [ ] Arquivo que não é imagem é recusado pelo formulário.
-- [ ] "Meus feedbacks" mostra só os feedbacks do usuário, pagina de 10 em 10 e zera as notificações não lidas.
-- [ ] GET em excluir retorna 405.
+- [x] Visitante é redirecionado ao login ao abrir o formulário e ao abrir "Meus feedbacks".
+- [x] Envio válido com imagem de teste (gerada pelo Pillow em memória) redireciona para o detalhe com a mensagem.
+- [x] Arquivo que não é imagem é recusado pelo formulário.
+- [x] "Meus feedbacks" mostra só os feedbacks do usuário, pagina de 10 em 10 e zera as notificações não lidas.
+- [x] GET em excluir retorna 405.
 
 Use `MEDIA_ROOT` temporário nos testes (`override_settings` com `tempfile.mkdtemp()`), para não deixar imagens na pasta do projeto.

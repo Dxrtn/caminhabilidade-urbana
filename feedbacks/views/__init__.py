@@ -1,1 +1,3 @@
-# As views desta app são criadas nas specs seguintes.
+from feedbacks.views.feedbacks import FeedbackCreateView, FeedbackExcluirView, MeusFeedbacksView
+
+__all__ = ["FeedbackCreateView", "FeedbackExcluirView", "MeusFeedbacksView"]

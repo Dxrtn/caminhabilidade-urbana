@@ -35,7 +35,7 @@
           <ul>
             {% if url_mapa %}<li><a href="{{ url_mapa }}">Mapa</a></li>{% endif %}
             {% if user.is_authenticated %}
-              {% if url_meus_feedbacks %}<li><a href="{{ url_meus_feedbacks }}">Meus feedbacks</a></li>{% endif %}
+              {% if url_meus_feedbacks %}<li><a href="{{ url_meus_feedbacks }}">Meus feedbacks{% if notificacoes_nao_lidas %} <span class="contador">{{ notificacoes_nao_lidas }}<span class="visualmente-oculto"> notificaç{{ notificacoes_nao_lidas|pluralize:"ão não lida,ões não lidas" }}</span></span>{% endif %}</a></li>{% endif %}
               {% if user.is_staff and url_painel %}<li><a href="{{ url_painel }}">Painel</a></li>{% endif %}
               {% if url_sair %}
                 <li>
