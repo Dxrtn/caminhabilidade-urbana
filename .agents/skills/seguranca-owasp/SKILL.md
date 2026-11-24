@@ -38,7 +38,7 @@ Referência: <https://top10.owasp.org/2025/>. Quando houver conflito, `docs/arqu
 ## A05: Injeção
 
 - Prefira o ORM. Em SQL bruto, passe valores como parâmetros, sem interpolar texto.
-- Mantenha o autoescape. Não use `safe`, `mark_safe` nem `autoescape off` em conteúdo enviado por usuários ([ADR 0003](../../../docs/adr/0003-conteudo-em-texto-puro.md)).
+- Mantenha o autoescape. Não use `safe`, `mark_safe` nem `autoescape off` em conteúdo enviado por usuários.
 - Não use `eval`, `exec`, `pickle` nem `shell=True` com dados externos.
 - Teste a exibição de conteúdo com `<script>`.
 
