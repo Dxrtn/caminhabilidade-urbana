@@ -273,6 +273,187 @@ button {
   border-radius: 0.375rem;
 }
 
+/* Classificação: texto + cor (a cor nunca é a única informação). */
+.classificacao {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.classificacao--ACESSIVEL { background: var(--cor-acessivel); }
+.classificacao--PARCIAL { background: var(--cor-parcial); }
+.classificacao--INACESSIVEL { background: var(--cor-inacessivel); }
+.classificacao--SEM_AVALIACAO { background: var(--cor-sem-avaliacao); }
+
+/* Painel */
+.painel-atalhos {
+  display: grid;
+  gap: var(--espaco);
+  padding: 0;
+  list-style: none;
+}
+
+.formulario--filtros {
+  max-width: none;
+  padding: var(--espaco);
+  background: var(--cor-superficie);
+  border-radius: 0.375rem;
+}
+
+/* Lista de obstáculos em checkboxes, com área de toque ampla. */
+.formulario div:has(> input[type="checkbox"]) label,
+.formulario label:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--toque-minimo);
+  font-weight: 400;
+}
+
+.coordenadas {
+  display: grid;
+  gap: var(--espaco);
+  margin: 0;
+  padding: var(--espaco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+}
+
+.coordenadas > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.mapa-trecho {
+  height: 280px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+}
+
+/* Tabela de gestão: cartões empilhados no celular, tabela a partir de 768 px. */
+.tabela-cartoes {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela-cartoes thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.tabela-cartoes tr {
+  display: block;
+  margin-bottom: var(--espaco);
+  padding: 0.75rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+}
+
+.tabela-cartoes td {
+  display: block;
+  padding: 0.25rem 0;
+}
+
+.tabela-cartoes td::before {
+  content: attr(data-rotulo) ": ";
+  font-weight: 600;
+}
+
+.tabela-cartoes td[data-rotulo="Logradouro"]::before,
+.tabela-cartoes td.acoes::before {
+  content: none;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.acoes a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-minimo);
+}
+
+.acoes form {
+  margin: 0;
+}
+
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco);
+}
+
+.paginacao a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-minimo);
+}
+
+.historico {
+  padding-left: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .painel-atalhos {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  }
+
+  .formulario--filtros {
+    grid-template-columns: repeat(4, 1fr) auto;
+    align-items: end;
+  }
+
+  .coordenadas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .coordenadas > legend,
+  .coordenadas > .helptext,
+  .mapa-trecho {
+    grid-column: 1 / -1;
+  }
+
+  .mapa-trecho {
+    height: 360px;
+  }
+
+  .tabela-cartoes thead {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+  }
+
+  .tabela-cartoes tr {
+    display: table-row;
+    border: 0;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+
+  .tabela-cartoes th,
+  .tabela-cartoes td {
+    display: table-cell;
+    padding: 0.5rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .tabela-cartoes td::before {
+    content: none;
+  }
+}
+
 /* Telas a partir de 768 px: o menu vira uma barra horizontal sempre visível.
    Só onde o navegador permite exibir o conteúdo de um details fechado;
    nos demais, o botão "Menu" continua funcionando. */

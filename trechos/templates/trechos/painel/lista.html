@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trechos — Painel{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'trechos:painel' %}">← Painel</a></p>
+  <h1>Trechos</h1>
+  <p><a class="botao" href="{% url 'trechos:criar' %}">Novo trecho</a></p>
+
+  <form method="get" action="{% url 'trechos:gestao' %}" class="formulario formulario--filtros">
+    {{ filtros }}
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <p>{{ pagina.paginator.count }} trecho{{ pagina.paginator.count|pluralize }} encontrado{{ pagina.paginator.count|pluralize }}.</p>
+
+  {% if pagina.object_list %}
+    <table class="tabela-cartoes">
+      <thead>
+        <tr>
+          <th scope="col">Logradouro</th>
+          <th scope="col">Bairro</th>
+          <th scope="col">Classificação</th>
+          <th scope="col">Situação</th>
+          <th scope="col">Atualizado em</th>
+          <th scope="col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trecho in pagina %}
+          <tr>
+            <td data-rotulo="Logradouro">
+              <strong>{{ trecho.logradouro }}</strong><br>
+              <small>{{ trecho.referencia_inicio }} → {{ trecho.referencia_fim }} ({{ trecho.get_lado_display }})</small>
+            </td>
+            <td data-rotulo="Bairro">{{ trecho.bairro }}</td>
+            <td data-rotulo="Classificação">
+              <span class="classificacao classificacao--{{ trecho.classificacao }}">{{ trecho.get_classificacao_display }}</span>
+            </td>
+            <td data-rotulo="Situação">{% if trecho.ativo %}Ativo{% else %}<strong>Inativo</strong>{% endif %}</td>
+            <td data-rotulo="Atualizado em">{{ trecho.atualizado_em|date:"d/m/Y" }}</td>
+            <td data-rotulo="Ações" class="acoes">
+              <a href="{% url 'trechos:editar' trecho.pk %}">Editar</a>
+              {% if trecho.ativo %}
+                <form method="post" action="{% url 'trechos:desativar' trecho.pk %}"
+                      data-confirmar="Desativar este trecho? Ele deixa de aparecer no mapa.">
+                  {% csrf_token %}
+                  <button type="submit" class="botao--secundario">Desativar</button>
+                </form>
+              {% else %}
+                <form method="post" action="{% url 'trechos:reativar' trecho.pk %}"
+                      data-confirmar="Reativar este trecho? Ele volta a aparecer no mapa.">
+                  {% csrf_token %}
+                  <button type="submit" class="botao--secundario">Reativar</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagina.has_other_pages %}
+      <nav class="paginacao" aria-label="Páginas">
+        {% if pagina.has_previous %}
+          <a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}">← Anterior</a>
+        {% endif %}
+        <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+        {% if pagina.has_next %}
+          <a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.next_page_number }}">Próxima →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p>Nenhum trecho com esses filtros.</p>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/confirmar.js' %}"></script>
+{% endblock %}

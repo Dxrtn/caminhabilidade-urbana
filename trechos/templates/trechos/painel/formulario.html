@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if trecho %}Editar trecho{% else %}Novo trecho{% endif %} — Painel{% endblock %}
+
+{% block extra_head %}
+  {% include "includes/leaflet_css.html" %}
+{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'trechos:gestao' %}">← Trechos</a></p>
+  <h1>{% if trecho %}Editar trecho{% else %}Novo trecho{% endif %}</h1>
+
+  <form method="post" enctype="multipart/form-data" class="formulario" novalidate
+        action="{% if trecho %}{% url 'trechos:editar' trecho.pk %}{% else %}{% url 'trechos:criar' %}{% endif %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for campo in form %}
+      {% if campo.name == "lat_inicio" %}
+        <fieldset class="coordenadas">
+          <legend>Pontos do trecho</legend>
+          <p class="helptext" id="ajuda-mapa">
+            No mapa, o primeiro clique marca o início e o segundo, o fim. Também dá para digitar as coordenadas.
+          </p>
+          <div id="mapa-trecho" class="mapa-trecho" role="application" aria-describedby="ajuda-mapa"></div>
+      {% endif %}
+
+      {{ campo.as_field_group }}
+
+      {% if campo.name == "lng_fim" %}
+        </fieldset>
+      {% endif %}
+    {% endfor %}
+
+    <button type="submit">Salvar trecho</button>
+  </form>
+
+  {% if trecho %}
+    <section aria-labelledby="titulo-historico">
+      <h2 id="titulo-historico">Histórico de classificação</h2>
+      {% if historico %}
+        <ol class="historico">
+          {% for item in historico %}
+            <li>
+              <time datetime="{{ item.alterado_em|date:'c' }}">{{ item.alterado_em|date:"d/m/Y H:i" }}</time>:
+              {{ item.classificacao_anterior|default:"(cadastro)" }} → {{ item.classificacao_nova }}
+              {% if item.alterado_por %}— {{ item.alterado_por.nome_completo }}{% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p>Sem registros.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  {% include "includes/leaflet_js.html" %}
+  <script src="{% static 'js/trecho_form.js' %}"></script>
+{% endblock %}

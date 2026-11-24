@@ -1,6 +1,6 @@
 # Spec 0004: Gestão de trechos
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-08 e RF-27 a RF-31 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0001](../adr/0001-mvt-com-camada-de-service.md), [ADR 0006](../adr/0006-mapa-com-leaflet-e-openstreetmap.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0002](0002-contas.md), [Spec 0003](0003-modelo-de-dados.md)
@@ -120,17 +120,17 @@ Templates em `trechos/templates/trechos/painel/`.
 
 ### Service e importadores
 
-- [ ] `criar` grava o trecho com obstáculos e `atualizado_por`, e a trigger registra o histórico inicial.
-- [ ] `criar` com bairro inexistente levanta `DadosDeTrechoInvalidos`; com trecho repetido, `TrechoDuplicado`.
-- [ ] `atualizar` mudando a classificação gera uma linha de histórico com o administrador.
-- [ ] `desativar` mantém o trecho no banco e o tira de `TrechoMapa`.
-- [ ] `listar_para_gestao` filtra por texto, bairro, classificação e desatualizados, e pagina de 10 em 10.
-- [ ] `ImportadorDadosExemplo` importa todos os trechos de exemplo; rodar de novo só gera ignorados.
-- [ ] `ImportadorCsv` importa um CSV válido e relata a linha com bairro inexistente sem parar as outras.
-- [ ] O comando falha sem gravar quando `--admin` não é administrador.
+- [x] `criar` grava o trecho com obstáculos e `atualizado_por`, e a trigger registra o histórico inicial.
+- [x] `criar` com bairro inexistente levanta `DadosDeTrechoInvalidos`; com trecho repetido, `TrechoDuplicado`.
+- [x] `atualizar` mudando a classificação gera uma linha de histórico com o administrador.
+- [x] `desativar` mantém o trecho no banco e o tira de `TrechoMapa`.
+- [x] `listar_para_gestao` filtra por texto, bairro, classificação e desatualizados, e pagina de 10 em 10.
+- [x] `ImportadorDadosExemplo` importa todos os trechos de exemplo; rodar de novo só gera ignorados.
+- [x] `ImportadorCsv` importa um CSV válido e relata a linha com bairro inexistente sem parar as outras.
+- [x] O comando falha sem gravar quando `--admin` não é administrador.
 
 ### Views
 
-- [ ] Rotas do painel redirecionam visitantes ao login e retornam 403 para usuário comum.
-- [ ] Administrador cria e edita um trecho pelo formulário.
-- [ ] GET em desativar e reativar retorna 405.
+- [x] Rotas do painel redirecionam visitantes ao login e retornam 403 para usuário comum.
+- [x] Administrador cria e edita um trecho pelo formulário.
+- [x] GET em desativar e reativar retorna 405.

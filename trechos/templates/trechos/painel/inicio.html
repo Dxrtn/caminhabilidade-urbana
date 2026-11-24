@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Painel — Caminhabilidade Urbana{% endblock %}
+
+{% block content %}
+  <h1>Painel</h1>
+  <p>Administração dos trechos e dos feedbacks enviados pelos usuários.</p>
+
+  {% url 'feedbacks:fila' as url_fila %}
+  <ul class="painel-atalhos">
+    <li><a class="botao" href="{% url 'trechos:gestao' %}">Trechos</a></li>
+    {# A fila de análise existe a partir da spec 0007; até lá o link não aparece. #}
+    {% if url_fila %}<li><a class="botao" href="{{ url_fila }}">Feedbacks em análise</a></li>{% endif %}
+  </ul>
+{% endblock %}

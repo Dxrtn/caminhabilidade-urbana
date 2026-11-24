@@ -181,3 +181,30 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** models de `trechos` (`Bairro`, `Obstaculo`, `Trecho`, `TrechoObstaculo`, `FotoTrecho`, `HistoricoTrecho`, `TrechoMapa`) e de `feedbacks` (`Feedback`, `FeedbackObstaculo`, `FotoFeedback`, `Notificacao`) com todas as constraints e índices da spec; migração de dados com 12 obstáculos e 49 bairros; trigger `trg_trecho_historico` e view `vw_trechos_mapa` em `RunSQL` com reversão e dependências explícitas; Admin somente leitura; 16 testes novos (50 no total). Desvios forçados pelo Django 6.1, documentados na spec e na ADR 0008 (proposta): `DO_NOTHING` no lugar de `PROTECT` (checks E050/E323) e índice `idx_trecho_bairro_classif` (limite de 30 caracteres, E034). Acrescentada `ck_feedback_motivo_rejeicao_valido`, exigida pela skill postgresql. Skills postgresql e django-boas-praticas atualizadas com essas regras.
 
 **Revisão da dupla:** ADR 0008 aceita por Davi.
+
+### 008 — 2026-11-24 — Implementação da spec 0004 (gestão de trechos)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0004
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0004-gestao-de-trechos.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Pontos de atenção:
+> - Os dados de exemplo (trechos/dados_exemplo.py) devem usar ruas reais de Ponta Verde, Pajuçara e Jatiúca,
+>   com coordenadas sobre a rua e dentro dos limites de Maceió definidos nas constraints da spec 0003.
+>   Confira que todos passam pelas constraints antes de terminar.
+> - O item "Painel" do menu do base.html deve passar a apontar para trechos:painel (visível só para administradores).
+> - A view provisória do mapa (trechos:mapa) continua como está; ela só é substituída na spec 0005.
+>
+> Ao final, rode python manage.py carregar_trechos --exemplo --admin admin@exemplo.com e me mostre o resumo
+> (importados, ignorados, erros). Depois rode de novo para confirmar que não duplica.
+> Marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** exceções de trechos, `DadosTrecho`, `TrechoService`, importadores (Template Method) e comando `carregar_trechos`; `TrechoForm` com mapa Leaflet (com SRI) para marcar os pontos; painel, lista com filtros e paginação, criar, editar com histórico, desativar e reativar. Os 36 trechos de exemplo são quarteirões reais (de esquina a esquina) de Pajuçara, Ponta Verde e Jatiúca, extraídos do OpenStreetMap (Overpass e Nominatim) por um script fora do projeto, que também conferiu o bairro de cada ponta pelos limites oficiais do OSM; a classificação e os obstáculos são fictícios. Carga real: 36 importados, 0 ignorados e 0 erros; na segunda execução, 0 importados e 36 ignorados. 23 testes novos (73 no total).
+
+**Revisão da dupla:** *(preencher)*
