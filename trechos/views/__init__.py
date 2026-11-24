@@ -1,4 +1,4 @@
-from trechos.views.mapa import MapaView
+from trechos.views.mapa import BuscaApiView, MapaView, TrechoDetalheView, TrechosApiView
 from trechos.views.painel import (
     PainelView,
     TrechoCreateView,
@@ -9,7 +9,10 @@ from trechos.views.painel import (
 )
 
 __all__ = [
+    "BuscaApiView",
     "MapaView",
+    "TrechoDetalheView",
+    "TrechosApiView",
     "PainelView",
     "TrechoCreateView",
     "TrechoDesativarView",

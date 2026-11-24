@@ -61,7 +61,7 @@
     {% endfor %}
   </div>
 
-  <main id="conteudo" class="conteudo" tabindex="-1">
+  <main id="conteudo" class="conteudo {% block classe_conteudo %}{% endblock %}" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 

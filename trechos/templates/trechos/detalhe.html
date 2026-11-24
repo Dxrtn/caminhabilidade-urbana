@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ trecho.logradouro }} — Caminhabilidade Urbana{% endblock %}
+
+{% block content %}
+  <article class="detalhe-trecho">
+    <h1>{{ trecho.logradouro }}</h1>
+    <p class="detalhe-trecho__bairro">{{ trecho.bairro }}</p>
+
+    {% if detalhe.desatualizado %}
+      <p class="aviso aviso--atencao"><strong>Atenção:</strong> este trecho não é atualizado há mais de 6 meses. As condições podem ter mudado.</p>
+    {% endif %}
+
+    <p>
+      <span class="classificacao classificacao--{{ trecho.classificacao }}">{{ trecho.get_classificacao_display }}</span>
+    </p>
+
+    <dl class="dados-trecho">
+      <dt>Início</dt><dd>{{ trecho.referencia_inicio }}</dd>
+      <dt>Fim</dt><dd>{{ trecho.referencia_fim }}</dd>
+      <dt>Lado</dt><dd>{{ trecho.get_lado_display }}</dd>
+      <dt>Obstáculos</dt>
+      <dd>{% for obstaculo in detalhe.obstaculos %}{{ obstaculo.nome }}{% if not forloop.last %}, {% endif %}{% empty %}Nenhum registrado{% endfor %}</dd>
+      <dt>Última atualização</dt><dd><time datetime="{{ trecho.atualizado_em|date:'c' }}">{{ trecho.atualizado_em|date:"d/m/Y" }}</time></dd>
+      {% if trecho.observacoes %}<dt>Observações</dt><dd>{{ trecho.observacoes }}</dd>{% endif %}
+    </dl>
+
+    {# Texto lido pelo botão "Ouvir" (RF-17). Montado em uma linha só, para a fala não ter pausas estranhas. #}
+    <div class="acoes-detalhe">
+      <button type="button" id="ouvir" class="botao" hidden
+              data-texto-voz="{{ trecho.logradouro }}, entre {{ trecho.referencia_inicio }} e {{ trecho.referencia_fim }}, {{ trecho.get_lado_display|lower }}. Classificação: {{ trecho.get_classificacao_display|lower }}. Obstáculos: {% for obstaculo in detalhe.obstaculos %}{{ obstaculo.nome|lower }}{% if forloop.revcounter == 2 %} e {% elif not forloop.last %}, {% endif %}{% empty %}nenhum{% endfor %}. Atualizado em {{ trecho.atualizado_em|date:'j \d\e F \d\e Y'|lower }}.">Ouvir</button>
+      <button type="button" id="parar-voz" class="botao--secundario" hidden>Parar</button>
+      {# "Enviar feedback" entra na spec 0006. #}
+      <a class="botao botao--secundario" href="{% url 'trechos:mapa' %}?trecho={{ trecho.pk }}">Voltar ao mapa</a>
+    </div>
+
+    {% if detalhe.fotos %}
+      <section aria-labelledby="titulo-fotos">
+        <h2 id="titulo-fotos">Fotos</h2>
+        <ul class="galeria">
+          {% for foto in detalhe.fotos %}
+            <li><img src="{{ foto.url }}" alt="{{ foto.descricao }}" loading="lazy"></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <section aria-labelledby="titulo-relatos">
+      <h2 id="titulo-relatos">Relatos recentes</h2>
+      {% if detalhe.relatos %}
+        <ul class="relatos">
+          {% for relato in detalhe.relatos %}
+            <li class="relato">
+              <p class="relato__cabecalho">
+                <strong>{{ relato.tipo_rotulo }}</strong>
+                · <time datetime="{{ relato.data|date:'c' }}">{{ relato.data|date:"d/m/Y" }}</time>
+                {% if relato.em_analise %}<span class="etiqueta">Em análise</span>{% endif %}
+              </p>
+              <p>{{ relato.descricao }}</p>
+              {% if relato.fotos %}
+                <ul class="galeria">
+                  {% for foto in relato.fotos %}
+                    <li><img src="{{ foto.url }}" alt="{{ foto.descricao }}" loading="lazy"></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>Ainda não há relatos sobre este trecho.</p>
+      {% endif %}
+    </section>
+  </article>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/voz.js' %}"></script>
+{% endblock %}

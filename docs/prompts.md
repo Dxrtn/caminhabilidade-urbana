@@ -208,3 +208,43 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** exceções de trechos, `DadosTrecho`, `TrechoService`, importadores (Template Method) e comando `carregar_trechos`; `TrechoForm` com mapa Leaflet (com SRI) para marcar os pontos; painel, lista com filtros e paginação, criar, editar com histórico, desativar e reativar. Os 36 trechos de exemplo são quarteirões reais (de esquina a esquina) de Pajuçara, Ponta Verde e Jatiúca, extraídos do OpenStreetMap (Overpass e Nominatim) por um script fora do projeto, que também conferiu o bairro de cada ponta pelos limites oficiais do OSM; a classificação e os obstáculos são fictícios. Carga real: 36 importados, 0 ignorados e 0 erros; na segunda execução, 0 importados e 36 ignorados. 23 testes novos (73 no total).
 
 **Revisão da dupla:** *(preencher)*
+
+### 009 — 2026-11-24 — Implementação da spec 0005 (mapa e detalhes)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0005
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0005-mapa-e-detalhes.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Pontos de atenção:
+> - Esta spec substitui a MapaView provisória criada na spec 0002. Remova a página "Mapa em construção"
+>   e a pendência correspondente em docs/state.md.
+> - O mapa deve ler os trechos pela view do banco vw_trechos_mapa (model TrechoMapa), não pela tabela trecho.
+> - O botão "Enviar feedback" do detalhe ainda não aparece: ele é ligado na spec 0006.
+> - O layout precisa funcionar a partir de 360 px de largura: o mapa ocupa a altura útil da tela,
+>   e os filtros e a busca ficam acima dele sem gerar rolagem horizontal.
+>
+> Marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** `TrechoConsultaService` (mapa e busca pela view `vw_trechos_mapa`; detalhe com relatos sem autor), `DetalheTrecho`/`Relato`/`FotoPublica`, `TextoDeBuscaCurto`; `MapaView` real no lugar da provisória, `TrechosApiView`, `BuscaApiView` e `TrechoDetalheView`; `static/js/mapa.js` (linhas com cor e padrão, legenda, filtros, busca com espera de 300 ms e teclado, localização, `?trecho=`) e `static/js/voz.js` (`speechSynthesis` em pt-BR). Interpretação registrada na spec: relatos rejeitados não aparecem em público. 15 testes novos (88 no total).
+
+**Revisão da dupla:** *(preencher; conferir o layout em 360 px)*
+
+### 010 — 2026-11-24 — Correção: tiles do mapa bloqueados (403)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0005
+
+**Prompt** (enviado com uma captura de tela do mapa coberto por "403 Access blocked"):
+
+> por algum motivo, ao acessar pelo navegador, ele bloqueia o acesso ao mapa mesmo permitindo o uso da localização
+
+**Resultado:** a causa não era a localização. A política de uso dos tiles do OpenStreetMap bloqueia navegadores que não enviam `Referer`, e o Django usa `SECURE_REFERRER_POLICY = "same-origin"` no site todo. Corrigido só na camada de tiles, com `referrerPolicy: "strict-origin-when-cross-origin"` em `static/js/mapa.js` e `static/js/trecho_form.js` (o navegador envia apenas a origem, sem o caminho).
+
+**Revisão da dupla:** mapa conferido no navegador por Davi, funcionando.

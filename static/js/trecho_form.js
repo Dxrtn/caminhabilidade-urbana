@@ -20,6 +20,8 @@
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">colaboradores do OpenStreetMap</a>',
+    // Os tiles do OSM exigem Referer; o Django usa "same-origin" no site todo (veja mapa.js).
+    referrerPolicy: "strict-origin-when-cross-origin",
   }).addTo(mapa);
 
   var marcadorInicio = null;

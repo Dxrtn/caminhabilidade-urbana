@@ -1,10 +1,61 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% comment %}Provisório: substituído pelo mapa na spec 0005.{% endcomment %}
+{% block title %}Mapa de calçadas — Caminhabilidade Urbana{% endblock %}
 
-{% block title %}Mapa — Caminhabilidade Urbana{% endblock %}
+{% block extra_head %}
+  {% include "includes/leaflet_css.html" %}
+{% endblock %}
+
+{% block classe_conteudo %}conteudo--mapa{% endblock %}
 
 {% block content %}
-  <h1>Mapa</h1>
-  <p>Mapa em construção.</p>
+  <h1 class="visualmente-oculto">Mapa de acessibilidade das calçadas</h1>
+
+  <div class="controles-mapa">
+    <div class="busca" role="search">
+      <label for="busca-texto">Buscar rua ou bairro</label>
+      <input type="search" id="busca-texto" autocomplete="off" placeholder="Ex.: Ponta Verde"
+             aria-describedby="busca-aviso" aria-controls="busca-resultados">
+      <p id="busca-aviso" class="busca__aviso" aria-live="polite"></p>
+      <ul id="busca-resultados" class="busca__resultados" hidden></ul>
+    </div>
+
+    <div class="filtros-mapa">
+      <div>
+        <label for="filtro-classificacao">Classificação</label>
+        <select id="filtro-classificacao">
+          <option value="">Todas</option>
+          {% for valor, rotulo in classificacoes %}
+            <option value="{{ valor }}">{{ rotulo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="filtro-obstaculo">Obstáculo</label>
+        <select id="filtro-obstaculo">
+          <option value="">Todos</option>
+          {% for obstaculo in obstaculos %}
+            <option value="{{ obstaculo.codigo }}">{{ obstaculo.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="controles-mapa__linha">
+      <button type="button" id="minha-localizacao" class="botao--secundario">Minha localização</button>
+      <p id="mapa-status" class="mapa-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div id="mapa" class="mapa"
+       data-api-trechos="{% url 'trechos:api_trechos' %}"
+       data-api-busca="{% url 'trechos:api_busca' %}"
+       data-url-detalhe="{% url 'trechos:detalhe' 0 %}"
+       aria-label="Mapa com os trechos de calçada"></div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "includes/leaflet_js.html" %}
+  <script src="{% static 'js/mapa.js' %}"></script>
 {% endblock %}

@@ -18,3 +18,7 @@ class TrechoDuplicado(TrechoErro):
 
 class DadosDeTrechoInvalidos(TrechoErro):
     mensagem = "Os dados do trecho são inválidos."
+
+
+class TextoDeBuscaCurto(TrechoErro):
+    mensagem = "Digite ao menos 3 letras."

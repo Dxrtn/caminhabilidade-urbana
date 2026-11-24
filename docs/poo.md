@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0004). Os demais caminhos ainda são planejados.
+Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0005). Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -58,3 +58,5 @@ Proteger o estado e as regras, expondo só uma interface pública.
 | `HistoricoTrecho` ✔ | Só a trigger `trg_trecho_historico` grava (`trechos/migrations/0003_trigger_historico_trecho.py`); no Admin é somente leitura, e nenhum service escreve nela |
 | `TrechoMapa` ✔ | Lê a view `vw_trechos_mapa` com `managed = False`; `save()` e `delete()` são sobrescritos para levantar `NotSupportedError`, então o objeto não pode ser gravado (`trechos/models/trecho_mapa.py`) |
 | `DadosTrecho` (`frozen=True`) ✔ | Objeto de dados imutável: depois de criado, não pode ser alterado (`trechos/services/dados.py`). O form e os importadores o criam, e o `TrechoService` só o lê |
+| `DetalheTrecho`, `Relato`, `FotoPublica` (`frozen=True`) ✔ | Saída imutável do `TrechoConsultaService.obter_detalhe` (`trechos/services/dados.py`). `Relato` não tem campo de autor: a view e o template não têm como mostrar quem enviou o feedback (RF-15) |
+| `TrechoConsultaService` ✔ | Somente leitura (`trechos/services/consulta_service.py`). Esconde que o mapa lê a view `vw_trechos_mapa` e que o detalhe consulta `feedbacks`; as regras dos relatos públicos ficam no método interno `_relatos()` |

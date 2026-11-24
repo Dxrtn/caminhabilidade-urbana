@@ -20,6 +20,8 @@
   --toque-minimo: 44px;
   --espaco: 1rem;
   --largura-maxima: 64rem;
+  /* Altura fixa do cabeçalho: o mapa usa o restante da tela. */
+  --altura-cabecalho: 3.25rem;
 }
 
 *,
@@ -105,6 +107,7 @@ button {
 }
 
 .cabecalho__barra {
+  min-height: var(--altura-cabecalho);
   position: relative;
   display: flex;
   align-items: center;
@@ -404,6 +407,222 @@ button {
   padding-left: 1.25rem;
 }
 
+/* Texto só para leitores de tela. */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Mapa (spec 0005) */
+.conteudo--mapa {
+  max-width: none;
+  padding: 0;
+}
+
+.controles-mapa {
+  display: grid;
+  gap: 0.5rem;
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: 0.75rem var(--espaco);
+}
+
+/* min-width: 0 impede que selects longos estourem a largura em 360 px. */
+.controles-mapa > *,
+.filtros-mapa > * {
+  min-width: 0;
+}
+
+.controles-mapa label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.controles-mapa input,
+.controles-mapa select {
+  width: 100%;
+  min-height: var(--toque-minimo);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+  font: inherit;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+}
+
+.filtros-mapa {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.controles-mapa__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mapa-status,
+.busca__aviso {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+}
+
+.busca {
+  position: relative;
+}
+
+.busca__resultados {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1100; /* acima dos painéis do Leaflet */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.busca__resultado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--cor-borda);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cor-texto);
+  text-align: left;
+}
+
+.busca__resultado span {
+  font-size: 0.875rem;
+  color: #4a4a4a;
+}
+
+.busca__resultado:hover,
+.busca__resultado:focus-visible {
+  background: var(--cor-superficie);
+}
+
+.mapa {
+  height: calc(100vh - var(--altura-cabecalho)); /* navegadores sem dvh */
+  height: calc(100dvh - var(--altura-cabecalho));
+  min-height: 20rem;
+  width: 100%;
+}
+
+.legenda-mapa {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.legenda-mapa__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.popup-trecho p {
+  margin: 0.25rem 0;
+}
+
+.popup-trecho a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-minimo);
+  font-weight: 600;
+}
+
+/* ---------- Detalhe do trecho */
+.detalhe-trecho__bairro {
+  margin-top: -0.5rem;
+  color: #4a4a4a;
+}
+
+.aviso {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--cor-parcial);
+  background: #fff4d6;
+}
+
+.dados-trecho {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.dados-trecho dt {
+  font-weight: 600;
+}
+
+.dados-trecho dd {
+  margin: 0;
+}
+
+.acoes-detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: var(--espaco) 0;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.375rem;
+}
+
+.relatos {
+  padding: 0;
+  list-style: none;
+}
+
+.relato {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.relato__cabecalho {
+  margin: 0;
+}
+
+.etiqueta {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  font-size: 0.8125rem;
+}
+
 @media (min-width: 768px) {
   .painel-atalhos {
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
@@ -451,6 +670,16 @@ button {
 
   .tabela-cartoes td::before {
     content: none;
+  }
+
+  /* Mapa: busca, filtros e botão em uma linha só. */
+  .controles-mapa {
+    grid-template-columns: 2fr 3fr auto;
+    align-items: start;
+  }
+
+  .controles-mapa__linha {
+    padding-top: 1.3rem; /* alinha com os campos, que têm rótulo em cima */
   }
 }
 

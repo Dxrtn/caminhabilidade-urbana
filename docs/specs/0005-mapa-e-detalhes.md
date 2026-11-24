@@ -1,6 +1,6 @@
 # Spec 0005: Mapa, busca, detalhes e leitura em voz
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-09 a RF-17 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0003](../adr/0003-site-web-responsivo.md), [ADR 0006](../adr/0006-mapa-com-leaflet-e-openstreetmap.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0003](0003-modelo-de-dados.md), [Spec 0004](0004-gestao-de-trechos.md)
@@ -33,7 +33,7 @@ Somente leitura. Consulta o mapa pela view `vw_trechos_mapa` (model `TrechoMapa`
 |---|---|
 | `listar_para_mapa(classificacao=None, obstaculo_codigo=None) -> list[dict]` | Lê `TrechoMapa`. `classificacao` inválida é ignorada. `obstaculo_codigo` filtra pelos ids de trechos que têm o obstáculo. Cada item: `id`, `logradouro`, `bairro`, `classificacao`, `classificacao_rotulo`, `coordenadas` (`[[lat_inicio, lng_inicio], [lat_fim, lng_fim]]`, como `float`) e `feedbacks_em_analise` |
 | `buscar(texto) -> list[dict]` | `texto` com menos de 3 caracteres (sem contar espaços) → `TextoDeBuscaCurto`. Busca `logradouro` ou `bairro` com `icontains` em `TrechoMapa`; no máximo 5 resultados, ordenados por logradouro. Cada item: `id`, `logradouro`, `bairro`, `referencias` e `centro` (ponto médio do trecho) |
-| `obter_detalhe(trecho_id) -> DetalheTrecho` | Trecho inexistente ou inativo → `TrechoNaoEncontrado`. Fotos públicas: todas as `FotoTrecho` mais as `FotoFeedback` aprovadas. Relatos: os 5 feedbacks mais recentes do trecho, sem o autor; relato em análise vai sem fotos, e relato aceito leva só as fotos aprovadas. `desatualizado`: última atualização há mais de 180 dias |
+| `obter_detalhe(trecho_id) -> DetalheTrecho` | Trecho inexistente ou inativo → `TrechoNaoEncontrado`. Fotos públicas: todas as `FotoTrecho` mais as `FotoFeedback` aprovadas de feedbacks aceitos. Relatos: os 5 feedbacks mais recentes do trecho, sem o autor e sem os rejeitados (que podem ter sido recusados por conteúdo impróprio); relato em análise vai sem fotos, e relato aceito leva só as fotos aprovadas. `desatualizado`: última atualização há mais de 180 dias |
 
 ## Rotas (`app_name = "trechos"`)
 
@@ -91,17 +91,17 @@ Chama `obter_detalhe`; `TrechoNaoEncontrado` → 404. Mostra os dados do RF-14, 
 
 ### Service
 
-- [ ] `listar_para_mapa` retorna só trechos ativos, com coordenadas como lista de pares `float`.
-- [ ] `listar_para_mapa` filtra por classificação e por obstáculo.
-- [ ] `buscar` com 2 letras levanta `TextoDeBuscaCurto`; com 3 encontra por logradouro e por bairro e limita a 5.
-- [ ] `obter_detalhe` de trecho inativo levanta `TrechoNaoEncontrado`.
-- [ ] `obter_detalhe` não expõe o autor dos relatos, omite fotos de relatos em análise e mostra só fotos aprovadas.
-- [ ] `obter_detalhe` marca `desatualizado` com mais de 180 dias.
+- [x] `listar_para_mapa` retorna só trechos ativos, com coordenadas como lista de pares `float`.
+- [x] `listar_para_mapa` filtra por classificação e por obstáculo.
+- [x] `buscar` com 2 letras levanta `TextoDeBuscaCurto`; com 3 encontra por logradouro e por bairro e limita a 5.
+- [x] `obter_detalhe` de trecho inativo levanta `TrechoNaoEncontrado`.
+- [x] `obter_detalhe` não expõe o autor dos relatos, omite fotos de relatos em análise e mostra só fotos aprovadas.
+- [x] `obter_detalhe` marca `desatualizado` com mais de 180 dias.
 
 ### Views
 
-- [ ] `/` retorna 200 para visitante e inclui o Leaflet.
-- [ ] `/api/trechos/` retorna JSON com os trechos e aplica os filtros.
-- [ ] `/api/busca/?q=ab` retorna lista vazia com aviso.
-- [ ] O detalhe de trecho ativo retorna 200 com o texto para voz; o de trecho inativo retorna 404.
-- [ ] Texto de relato com `<script>` aparece escapado no detalhe.
+- [x] `/` retorna 200 para visitante e inclui o Leaflet.
+- [x] `/api/trechos/` retorna JSON com os trechos e aplica os filtros.
+- [x] `/api/busca/?q=ab` retorna lista vazia com aviso.
+- [x] O detalhe de trecho ativo retorna 200 com o texto para voz; o de trecho inativo retorna 404.
+- [x] Texto de relato com `<script>` aparece escapado no detalhe.
