@@ -293,3 +293,29 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** `FeedbackJaAnalisado` e `MotivoDeRejeicaoInvalido`; `AnaliseService` (fila do mais antigo para o mais recente, aceitar e rejeitar com `select_for_update` só no feedback, mudança do trecho pelo `TrechoService`, aprovação só das fotos do próprio feedback e notificação do autor); forms de aceitar, rejeitar e filtro; fila e tela de análise com o aviso sobre rostos e placas; contagem no painel com import dentro do método, registrada como segunda exceção em `docs/arquitetura.md`. Interpretação registrada na spec: os obstáculos marcados só mudam o trecho quando o administrador escolhe uma classificação. 18 testes novos (132 no total), incluindo o fluxo completo envio → aceite → `/api/trechos/`.
 
 **Revisão da dupla:** testado no navegador por Davi.
+
+### 013 — 2026-11-24 — Implementação da spec 0008 (banco: permissões e exportação)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0008
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0008-banco-permissoes-e-exportacao.md, seguindo docs/arquitetura.md
+> e as skills indicadas, principalmente .agents/skills/postgresql/SKILL.md.
+> Implemente apenas esta spec e escreva o teste automatizado listado nela.
+>
+> Pontos de atenção:
+> - O 02_permissoes.sql será executado pelo pgAdmin (Query Tool), conectado ao banco caminhabilidade como postgres.
+>   Ele precisa funcionar executado de uma vez (F5), sem comandos que exijam o psql (nada de \c ou \connect).
+> - Rode python manage.py exportar_sql e me mostre a contagem de CREATE TABLE, CHECK, CREATE INDEX,
+>   CREATE TRIGGER e CREATE VIEW encontrada em banco/schema.sql.
+> - Complete a tabela de critérios de banco/README.md com os nomes reais dos objetos.
+>
+> Marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo.
+
+**Resultado:** `banco/02_permissoes.sql` (papéis `caminhabilidade_app` e `caminhabilidade_leitura` criados com `DO $$ ... IF NOT EXISTS`, `REVOKE` do acesso de `PUBLIC`, `GRANT` de dados sem `CREATE`, `ALTER DEFAULT PRIVILEGES` e bloco de demonstração), sem comandos do `psql`; comando `exportar_sql` (migrações de contas, trechos e feedbacks em ordem, pelo `MigrationLoader` e `sqlmigrate`) e `banco/schema.sql` gerado com 14 `CREATE TABLE`, 19 `CHECK`, 28 `CREATE INDEX` (2 do projeto, 1 único parcial e 25 automáticos do Django), 1 `CREATE TRIGGER` e 1 `CREATE VIEW`; tabela de critérios do `banco/README.md` com os nomes reais. 1 teste novo (133 no total). As verificações manuais (executar o `02_permissoes.sql` e testar com o usuário da aplicação) ficaram para a dupla.
+
+**Revisão da dupla:** *(preencher com o resultado das verificações manuais)*

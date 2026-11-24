@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0007). Os demais caminhos ainda são planejados.
+Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0008). Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -26,6 +26,7 @@ Reaproveitar e especializar comportamento a partir de uma classe base.
 | `EnviadorSmsSimulado`, `EnviadorEmMemoria` | `EnviadorDeCodigo` | O contrato `enviar()`, que cada uma implementa do seu jeito. `EnviadorEmMemoria` também tem o atributo de classe `enviados` e o método de classe `limpar()` | `contas/services/enviadores.py` ✔ |
 | `ImportadorDadosExemplo`, `ImportadorCsv` | `ImportadorDeTrechos` | O algoritmo completo de `importar()` e o atributo `_administrador`. `ImportadorCsv` estende o construtor com `super().__init__()` e sobrescreve também `_posicao()`, para os erros citarem a linha do arquivo | `trechos/services/importadores.py` ✔ |
 | `AdministradorRequeridoMixin` | `LoginRequiredMixin` e `UserPassesTestMixin` | Herança múltipla: exige login **e** `is_staff`. Sobrescreve só `test_func()`; pela ordem de resolução (MRO), o login é verificado primeiro | `comum/mixins.py` ✔ |
+| `Command` de `carregar_trechos` e de `exportar_sql` | `BaseCommand` (Django) | A leitura dos argumentos, a saída no terminal e o `call_command`; cada comando sobrescreve só `add_arguments()` e `handle()` | `trechos/management/commands/carregar_trechos.py` ✔, `comum/management/commands/exportar_sql.py` ✔ |
 | Todas as views | `django.views.View` | O despacho por método HTTP. Já existem `CadastroView`, `VerificarCelularView`, `ReenviarCodigoView`, `EntrarView`, `SairView` (com `LoginRequiredMixin`) e a `MapaView` provisória; o teste `comum/tests/test_arquitetura.py` garante a regra | `contas/views/` ✔, `trechos/views/` ✔, `feedbacks/views/` |
 | `EntrarForm` | `AuthenticationForm` (Django) | Autenticação e mensagens de erro; sobrescreve `clean_username()` e o rótulo "E-mail" | `contas/forms/entrar.py` ✔ |
 | Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app, cada filha sobrescrevendo só o atributo `mensagem`. Em contas: `EmailJaCadastrado`, `CelularJaCadastrado`, `CodigoInvalido`, `CodigoExpirado`, `LimiteDeReenvioAtingido` e `UsuarioNaoEncontrado`. Em trechos: `TrechoNaoEncontrado`, `TrechoDuplicado`, `DadosDeTrechoInvalidos` e `TextoDeBuscaCurto`. Em feedbacks: `LimiteDiarioAtingido`, `FeedbackEmAnaliseExistente`, `FeedbackIncompleto`, `FotosEmExcesso`, `FeedbackNaoEncontrado`, `FeedbackNaoPodeSerExcluido`, `FeedbackJaAnalisado` e `MotivoDeRejeicaoInvalido` | `contas/exceptions.py` ✔, `trechos/exceptions.py` ✔, `feedbacks/exceptions.py` ✔ |

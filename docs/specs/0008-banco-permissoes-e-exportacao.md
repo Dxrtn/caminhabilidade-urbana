@@ -1,6 +1,6 @@
 # Spec 0008: Banco — contas, permissões e exportação do SQL
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RNF-05 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0004](../adr/0004-postgresql-como-banco-de-dados.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0003](0003-modelo-de-dados.md) e de todas as migrações já criadas
@@ -18,7 +18,7 @@ Esta spec produz os arquivos entregues à disciplina de Banco de Dados, que aval
 
 ## `banco/02_permissoes.sql`
 
-Executado pelo superusuário `postgres` **depois** das migrações, conectado ao banco `caminhabilidade`. Deve ser idempotente quando possível (`DO $$ ... IF NOT EXISTS ... $$` para os papéis) e comentado em português.
+Executado pelo superusuário `postgres` **depois** das migrações, conectado ao banco `caminhabilidade`, de uma vez (F5 no Query Tool do pgAdmin ou `psql -f`), sem comandos exclusivos do `psql` como `\c`. Deve ser idempotente quando possível (`DO $$ ... IF NOT EXISTS ... $$` para os papéis) e comentado em português.
 
 | Papel | Tipo | Permissões |
 |---|---|---|
@@ -53,6 +53,7 @@ python manage.py exportar_sql
 - Percorre, em ordem, as migrações das apps `contas`, `trechos` e `feedbacks` (use o `MigrationLoader` para listar os nomes) e chama `sqlmigrate` para cada uma com `call_command`, capturando a saída.
 - Grava `banco/schema.sql` com um cabeçalho (projeto, data de geração, comando usado) e, antes de cada migração, um comentário `-- Migração: <app>.<nome>`.
 - Ao final, exibe quantos `CREATE TABLE`, `CHECK`, `CREATE INDEX`, `CREATE TRIGGER` e `CREATE VIEW` o arquivo contém, para conferência rápida.
+- A opção `--saida <arquivo>` grava em outro caminho (usada pelo teste, para não sobrescrever o `schema.sql` versionado).
 
 ## `banco/README.md` — tabela de critérios
 
@@ -62,12 +63,12 @@ Complete a tabela do README com o nome real de cada objeto no banco:
 |---|---|
 | Tabelas com as 4 integridades | `schema.sql`: chaves primárias e `UNIQUE` (entidade); tipos, `NOT NULL` e `CHECK` de opções (domínio); `REFERENCES` com `ON DELETE` (referencial); `CHECK` e índice único parcial de regras de negócio (definida pelo usuário) |
 | Trigger | `trg_trecho_historico` e a função `fn_registrar_historico_trecho` |
-| Campo indexado | `idx_feedback_status_criado` e `idx_trecho_bairro_classificacao` |
+| Campo indexado | `idx_feedback_status_criado` e `idx_trecho_bairro_classif` |
 | Contas e permissões | `02_permissoes.sql` |
 | View | `vw_trechos_mapa` |
 
 ## Testes e verificação
 
-- [ ] Teste automatizado: `exportar_sql` gera um arquivo que contém `CREATE TRIGGER`, `CREATE VIEW`, `CREATE INDEX "idx_feedback_status_criado"` e `CHECK`.
+- [x] Teste automatizado: `exportar_sql` gera um arquivo que contém `CREATE TRIGGER`, `CREATE VIEW`, `CREATE INDEX "idx_feedback_status_criado"` e `CHECK`.
 - [ ] Verificação manual (registrar o resultado em `docs/state.md`): `02_permissoes.sql` executa sem erro, e a demonstração no `psql` mostra o `SELECT` permitido e as duas permissões negadas.
 - [ ] Verificação manual: com `DB_USER=caminhabilidade_app` (e a senha dele) no `.env`, o sistema funciona normalmente em `python manage.py runserver`, mas, em `python manage.py dbshell`, o comando `CREATE TABLE teste (id int);` falha por falta de permissão. Depois, voltar o `.env` para o dono.
