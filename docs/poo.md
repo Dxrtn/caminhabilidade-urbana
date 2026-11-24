@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0006). Os demais caminhos ainda são planejados.
+Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0007). Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -28,7 +28,7 @@ Reaproveitar e especializar comportamento a partir de uma classe base.
 | `AdministradorRequeridoMixin` | `LoginRequiredMixin` e `UserPassesTestMixin` | Herança múltipla: exige login **e** `is_staff`. Sobrescreve só `test_func()`; pela ordem de resolução (MRO), o login é verificado primeiro | `comum/mixins.py` ✔ |
 | Todas as views | `django.views.View` | O despacho por método HTTP. Já existem `CadastroView`, `VerificarCelularView`, `ReenviarCodigoView`, `EntrarView`, `SairView` (com `LoginRequiredMixin`) e a `MapaView` provisória; o teste `comum/tests/test_arquitetura.py` garante a regra | `contas/views/` ✔, `trechos/views/` ✔, `feedbacks/views/` |
 | `EntrarForm` | `AuthenticationForm` (Django) | Autenticação e mensagens de erro; sobrescreve `clean_username()` e o rótulo "E-mail" | `contas/forms/entrar.py` ✔ |
-| Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app, cada filha sobrescrevendo só o atributo `mensagem`. Em contas: `EmailJaCadastrado`, `CelularJaCadastrado`, `CodigoInvalido`, `CodigoExpirado`, `LimiteDeReenvioAtingido` e `UsuarioNaoEncontrado`. Em trechos: `TrechoNaoEncontrado`, `TrechoDuplicado`, `DadosDeTrechoInvalidos` e `TextoDeBuscaCurto`. Em feedbacks: `LimiteDiarioAtingido`, `FeedbackEmAnaliseExistente`, `FeedbackIncompleto`, `FotosEmExcesso`, `FeedbackNaoEncontrado` e `FeedbackNaoPodeSerExcluido` | `contas/exceptions.py` ✔, `trechos/exceptions.py` ✔, `feedbacks/exceptions.py` ✔ |
+| Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app, cada filha sobrescrevendo só o atributo `mensagem`. Em contas: `EmailJaCadastrado`, `CelularJaCadastrado`, `CodigoInvalido`, `CodigoExpirado`, `LimiteDeReenvioAtingido` e `UsuarioNaoEncontrado`. Em trechos: `TrechoNaoEncontrado`, `TrechoDuplicado`, `DadosDeTrechoInvalidos` e `TextoDeBuscaCurto`. Em feedbacks: `LimiteDiarioAtingido`, `FeedbackEmAnaliseExistente`, `FeedbackIncompleto`, `FotosEmExcesso`, `FeedbackNaoEncontrado`, `FeedbackNaoPodeSerExcluido`, `FeedbackJaAnalisado` e `MotivoDeRejeicaoInvalido` | `contas/exceptions.py` ✔, `trechos/exceptions.py` ✔, `feedbacks/exceptions.py` ✔ |
 | `CampoDeVariasImagens` | `forms.ImageField` (Django) | A validação de imagem com Pillow; sobrescreve `__init__` (limite de arquivos configurável) e `clean()`, que valida cada arquivo com o `clean()` da classe base. Usado pelo formulário de trecho (até 5) e pelo de feedback (limite no service) | `comum/forms.py` ✔ |
 
 ## Polimorfismo
@@ -59,4 +59,5 @@ Proteger o estado e as regras, expondo só uma interface pública.
 | `TrechoMapa` ✔ | Lê a view `vw_trechos_mapa` com `managed = False`; `save()` e `delete()` são sobrescritos para levantar `NotSupportedError`, então o objeto não pode ser gravado (`trechos/models/trecho_mapa.py`) |
 | `DadosTrecho` (`frozen=True`) ✔ | Objeto de dados imutável: depois de criado, não pode ser alterado (`trechos/services/dados.py`). O form e os importadores o criam, e o `TrechoService` só o lê |
 | `DetalheTrecho`, `Relato`, `FotoPublica` (`frozen=True`) ✔ | Saída imutável do `TrechoConsultaService.obter_detalhe` (`trechos/services/dados.py`). `Relato` não tem campo de autor: a view e o template não têm como mostrar quem enviou o feedback (RF-15) |
-| `TrechoConsultaService` ✔ | Somente leitura (`trechos/services/consulta_service.py`). Esconde que o mapa lê a view `vw_trechos_mapa` e que o detalhe consulta `feedbacks`; as regras dos relatos públicos ficam no método interno `_relatos()` |
+
+| `AnaliseService` ✔ | As views da análise só chamam `aceitar` e `rejeitar`; a trava da linha (`select_for_update`), o controle de status, a chamada ao `TrechoService` e a notificação ficam nos métodos internos `_obter_em_analise()` e `_registrar_analise()` (`feedbacks/services/analise_service.py`) |

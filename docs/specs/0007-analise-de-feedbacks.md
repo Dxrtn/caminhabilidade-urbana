@@ -1,6 +1,6 @@
 # Spec 0007: Análise de feedbacks
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-26, RF-29 e RF-32 a RF-34 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0001](../adr/0001-mvt-com-camada-de-service.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0004](0004-gestao-de-trechos.md), [Spec 0006](0006-feedbacks.md)
@@ -24,7 +24,7 @@ Esta spec fecha o ciclo do sistema: o feedback do usuário, aceito pelo administ
 
 ## Forms
 
-- `AceitarFeedbackForm`: `nova_classificacao` (opcional, com a opção "Manter a atual"), `obstaculos` (opcional, pré-marcado com os obstáculos do feedback) e `fotos_aprovadas` (checkboxes com miniaturas das fotos do feedback).
+- `AceitarFeedbackForm`: `nova_classificacao` (opcional, com a opção "Manter a atual"), `obstaculos` (opcional, pré-marcado com os obstáculos do feedback) e `fotos_aprovadas` (checkboxes com miniaturas das fotos do feedback). Os obstáculos marcados só substituem os do trecho quando o administrador escolhe uma classificação; com "Manter a atual", o trecho não muda. Escolher a classificação que o trecho já tem atualiza só os obstáculos, sem gerar histórico.
 - `RejeitarFeedbackForm`: `motivo` (obrigatório) e `texto` (obrigatório quando o motivo é "Outro"; a validação de negócio fica no service).
 
 ## Rotas (`app_name = "feedbacks"`)
@@ -49,16 +49,16 @@ Todas usam `AdministradorRequeridoMixin`.
 
 ### Service
 
-- [ ] `fila` traz só feedbacks em análise, do mais antigo para o mais recente.
-- [ ] `aceitar` com nova classificação muda o trecho, e o histórico (pela trigger) registra o administrador.
-- [ ] `aceitar` sem nova classificação não cria linha de histórico.
-- [ ] `aceitar` aprova só as fotos indicadas e só deste feedback.
-- [ ] `aceitar` ou `rejeitar` um feedback já analisado levanta `FeedbackJaAnalisado`.
-- [ ] `rejeitar` com `OUTRO` sem texto levanta `MotivoDeRejeicaoInvalido`.
-- [ ] Aceitar e rejeitar criam a notificação para o autor.
-- [ ] Depois de aceito, o usuário pode enviar um novo feedback no mesmo trecho.
+- [x] `fila` traz só feedbacks em análise, do mais antigo para o mais recente.
+- [x] `aceitar` com nova classificação muda o trecho, e o histórico (pela trigger) registra o administrador.
+- [x] `aceitar` sem nova classificação não cria linha de histórico.
+- [x] `aceitar` aprova só as fotos indicadas e só deste feedback.
+- [x] `aceitar` ou `rejeitar` um feedback já analisado levanta `FeedbackJaAnalisado`.
+- [x] `rejeitar` com `OUTRO` sem texto levanta `MotivoDeRejeicaoInvalido`.
+- [x] Aceitar e rejeitar criam a notificação para o autor.
+- [x] Depois de aceito, o usuário pode enviar um novo feedback no mesmo trecho.
 
 ### Views
 
-- [ ] Rotas da análise retornam 403 para usuário comum e redirecionam visitantes.
-- [ ] O fluxo completo pelo cliente de teste: usuário envia → administrador aceita com nova classificação → `/api/trechos/` retorna a nova classificação.
+- [x] Rotas da análise retornam 403 para usuário comum e redirecionam visitantes.
+- [x] O fluxo completo pelo cliente de teste: usuário envia → administrador aceita com nova classificação → `/api/trechos/` retorna a nova classificação.

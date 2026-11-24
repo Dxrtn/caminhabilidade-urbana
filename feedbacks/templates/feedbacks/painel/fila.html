@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Feedbacks em análise — Painel{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'trechos:painel' %}">← Painel</a></p>
+  <h1>Feedbacks em análise</h1>
+
+  <form method="get" action="{% url 'feedbacks:fila' %}" class="formulario formulario--filtros formulario--filtros-curto">
+    {{ filtros }}
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <p>{{ pagina.paginator.count }} feedback{{ pagina.paginator.count|pluralize }} na fila, do mais antigo para o mais recente.</p>
+
+  {% if pagina.object_list %}
+    <ul class="lista-feedbacks">
+      {% for feedback in pagina %}
+        <li class="cartao-feedback">
+          <p>
+            <a href="{% url 'feedbacks:analisar' feedback.pk %}"><strong>{{ feedback.trecho.logradouro }}</strong></a>
+            — {{ feedback.trecho.bairro }}<br>
+            <small>{{ feedback.criado_em|date:"d/m/Y H:i" }} · {{ feedback.get_tipo_display }}</small>
+          </p>
+          <p>
+            {{ feedback.fotos.all|length }} foto{{ feedback.fotos.all|length|pluralize }}
+            {% if feedback.enviado_a_distancia %}<span class="etiqueta etiqueta--atencao">Enviado à distância</span>{% endif %}
+          </p>
+          <p class="cartao-feedback__descricao">{{ feedback.descricao|truncatechars:140 }}</p>
+          <p><a class="botao" href="{% url 'feedbacks:analisar' feedback.pk %}">Analisar</a></p>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if pagina.has_other_pages %}
+      <nav class="paginacao" aria-label="Páginas">
+        {% if pagina.has_previous %}
+          <a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}">← Anterior</a>
+        {% endif %}
+        <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+        {% if pagina.has_next %}
+          <a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.next_page_number }}">Próxima →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p>Nenhum feedback aguardando análise.</p>
+  {% endif %}
+{% endblock %}

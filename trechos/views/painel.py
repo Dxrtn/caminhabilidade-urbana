@@ -11,7 +11,11 @@ from trechos.services import TrechoService
 
 class PainelView(AdministradorRequeridoMixin, View):
     def get(self, request):
-        return render(request, "trechos/painel/inicio.html")
+        # Exceção de dependência trechos -> feedbacks (docs/arquitetura.md): import aqui dentro
+        # para evitar import circular, já que feedbacks importa de trechos.
+        from feedbacks.services import AnaliseService
+
+        return render(request, "trechos/painel/inicio.html", {"em_analise": AnaliseService.contar_em_analise()})
 
 
 class TrechoGestaoListView(AdministradorRequeridoMixin, View):

@@ -30,3 +30,11 @@ class FeedbackNaoEncontrado(FeedbackErro):
 
 class FeedbackNaoPodeSerExcluido(FeedbackErro):
     mensagem = "Este feedback já foi analisado e não pode mais ser excluído."
+
+
+class FeedbackJaAnalisado(FeedbackErro):
+    mensagem = "Este feedback já foi analisado por outra pessoa."
+
+
+class MotivoDeRejeicaoInvalido(FeedbackErro):
+    mensagem = "Escolha um motivo válido. Para \"Outro\", descreva o motivo."

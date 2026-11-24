@@ -12,7 +12,7 @@ O projeto segue MVT, com as regras de negócio concentradas na camada de service
 | `trechos` | Bairros, obstáculos, trechos, histórico, mapa e gestão de trechos |
 | `feedbacks` | Feedbacks, fotos de feedback, notificações e análise |
 
-Dependências permitidas: `contas`, `trechos` e `feedbacks` podem importar de `comum`, e `feedbacks` pode importar de `trechos`. No sentido contrário há uma única exceção: o `TrechoConsultaService` lê os relatos de feedback para o detalhe do trecho, com o import feito dentro do método para evitar import circular.
+Dependências permitidas: `contas`, `trechos` e `feedbacks` podem importar de `comum`, e `feedbacks` pode importar de `trechos`. No sentido contrário há duas exceções, ambas com o import feito dentro do método para evitar import circular: o `TrechoConsultaService` lê os relatos de feedback para o detalhe do trecho, e a `PainelView` chama `AnaliseService.contar_em_analise()` para mostrar a contagem da fila no painel.
 
 ## Fluxo de uma requisição
 

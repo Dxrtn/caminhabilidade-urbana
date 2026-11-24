@@ -782,3 +782,42 @@ button {
 .cartao-feedback__descricao {
   color: #4a4a4a;
 }
+
+/* ---------- Análise de feedbacks (spec 0007) */
+.etiqueta--atencao {
+  border-color: var(--cor-parcial);
+  background: #fff4d6;
+}
+
+.botao--perigo {
+  border-color: var(--cor-inacessivel);
+  background: var(--cor-inacessivel);
+}
+
+.fotos-aprovadas {
+  margin: 0;
+  padding: var(--espaco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.375rem;
+}
+
+.foto-opcao {
+  display: grid;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.formularios-analise {
+  display: grid;
+  gap: var(--espaco);
+}
+
+@media (min-width: 768px) {
+  .formulario--filtros-curto {
+    grid-template-columns: 1fr 1fr auto;
+  }
+
+  .formularios-analise {
+    grid-template-columns: 1fr 1fr;
+  }
+}

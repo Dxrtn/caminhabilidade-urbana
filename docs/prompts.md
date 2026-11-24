@@ -274,3 +274,22 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** exceções de feedbacks; `FeedbackService` (verificações na ordem da spec, distância por Haversine sem guardar a posição, `IntegrityError` da constraint convertido pelo nome em `FeedbackEmAnaliseExistente`, exclusão das fotos do disco só após o commit) e `NotificacaoService`; context processor com o contador no menu; `FeedbackForm` com câmera no celular; views de envio, "Meus feedbacks" e exclusão; botão "Enviar feedback" no detalhe. `CampoDeVariasImagens` passou para `comum/forms.py`, com limite configurável. 26 testes novos (114 no total), com `MEDIA_ROOT` temporário.
 
 **Revisão da dupla:** *(preencher)*
+
+### 012 — 2026-11-24 — Implementação da spec 0007 (análise de feedbacks)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0007
+
+**Prompt** (chegou cortado no fim; a IA seguiu a regra da própria spec para o import e o padrão dos pedidos anteriores para o fechamento):
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0007-analise-de-feedbacks.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Pontos de atenção:
+> - Mostre no painel (spec 0004) o link "Feedbacks em análise" com a contagem de AnaliseService.contar_em_analise().
+>   Como o painel é uma view de trechos, faça o import
+
+**Resultado:** `FeedbackJaAnalisado` e `MotivoDeRejeicaoInvalido`; `AnaliseService` (fila do mais antigo para o mais recente, aceitar e rejeitar com `select_for_update` só no feedback, mudança do trecho pelo `TrechoService`, aprovação só das fotos do próprio feedback e notificação do autor); forms de aceitar, rejeitar e filtro; fila e tela de análise com o aviso sobre rostos e placas; contagem no painel com import dentro do método, registrada como segunda exceção em `docs/arquitetura.md`. Interpretação registrada na spec: os obstáculos marcados só mudam o trecho quando o administrador escolhe uma classificação. 18 testes novos (132 no total), incluindo o fluxo completo envio → aceite → `/api/trechos/`.
+
+**Revisão da dupla:** testado no navegador por Davi.
