@@ -5,6 +5,8 @@
 - **Decisões:** [ADR 0003](../adr/0003-site-web-responsivo.md), [ADR 0006](../adr/0006-mapa-com-leaflet-e-openstreetmap.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
 - **Depende de:** [Spec 0003](0003-modelo-de-dados.md), [Spec 0004](0004-gestao-de-trechos.md)
 
+> **Observação:** desde a [spec 0002](0002-contas.md) existe uma `MapaView` provisória em `trechos/views/mapa.py`, na rota `trechos:mapa`, que só renderiza `trechos/mapa.html` com o texto "Mapa em construção". Ela foi criada para o cadastro e o login terem para onde redirecionar. Esta spec **substitui** essa view e esse template pelo mapa descrito abaixo, mantendo a rota e o nome.
+
 Para testar no navegador, carregue antes os trechos de exemplo com `python manage.py carregar_trechos --exemplo --admin <e-mail>`.
 
 ## Exceções

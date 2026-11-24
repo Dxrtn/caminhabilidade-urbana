@@ -156,4 +156,4 @@ Percorre os módulos de `contas.views`, `trechos.views` e `feedbacks.views` e fa
 - [x] `python manage.py check` não reporta problemas.
 - [x] `python manage.py migrate` executa no PostgreSQL usando `contas.Usuario`.
 - [x] `python manage.py createsuperuser` funciona pedindo e-mail, nome completo e celular.
-- [ ] A página base abre em 360 px de largura sem rolagem horizontal.
+- [x] A página base abre em 360 px de largura sem rolagem horizontal.

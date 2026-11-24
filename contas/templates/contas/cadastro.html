@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Criar conta — Caminhabilidade Urbana{% endblock %}
+
+{% block content %}
+  <h1>Criar conta</h1>
+  <p>Com a conta, você pode enviar feedbacks sobre as calçadas. Leia os <a href="#termos">termos de uso</a>.</p>
+
+  <form method="post" action="{% url 'contas:cadastro' %}" class="formulario" novalidate>
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Criar conta</button>
+  </form>
+
+  <p>Já tem conta? <a href="{% url 'contas:entrar' %}">Entrar</a></p>
+
+  <section id="termos" class="termos" aria-labelledby="titulo-termos">
+    <h2 id="titulo-termos">Termos de uso</h2>
+    <p>
+      Usamos seu nome, e-mail e celular apenas para identificar sua conta e confirmar que o celular é seu.
+      A forma de locomoção, se informada, ajuda a entender quem relata cada problema.
+    </p>
+    <p>
+      Sua localização é usada só no seu aparelho, para mostrar o mapa e conferir a distância ao enviar um
+      feedback. Ela não é armazenada.
+    </p>
+  </section>
+{% endblock %}

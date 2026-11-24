@@ -113,3 +113,42 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** pasta `skills/` movida para `.agents/skills/` (com `git mv`), o caminho que o `AGENTS.md` e as specs já usavam. Removido da skill `seguranca-owasp` um link para uma ADR do repositório-modelo que não existe neste projeto.
 
 **Revisão da dupla:** *(preencher)*
+
+### 005 — 2026-11-24 — Implementação da spec 0002 (contas)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0002
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0002-contas.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Ajuste necessário: a spec 0002 redireciona para "trechos:mapa", mas o mapa só será implementado na spec 0005.
+> Crie agora em trechos/urls.py (app_name = "trechos") a rota "" com nome "mapa", apontando para uma MapaView
+> provisória (herdando de View) que renderiza trechos/mapa.html com o texto "Mapa em construção" usando o base.html.
+> Registre essa pendência em docs/state.md e acrescente na spec 0005 uma observação de que ela substitui essa view provisória.
+>
+> Ao final, marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** model `CodigoVerificacao` com `ck_codigo_seis_digitos`, `ck_codigo_expira_depois_de_criado` e `ON DELETE CASCADE` (migração `contas/0002`); `EnviadorDeCodigo` e suas duas subclasses; exceções de `contas`; `CadastroService` e `VerificacaoService`; `CadastroForm`, `VerificacaoForm` e `EntrarForm`; as cinco views e rotas de contas, com templates; `MapaView` provisória; 21 testes novos (34 no total) passando. Além do texto da spec: o e-mail é guardado e comparado em minúsculas, e foi criado `VerificacaoService.obter_pendente()` para a view mostrar o celular mascarado sem acessar o ORM.
+
+**Revisão da dupla:** *(preencher)*
+
+### 006 — 2026-11-24 — Conferência dos 360 px e commit da spec 0002
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0001 e 0002
+
+**Prompt:**
+
+> verifiquei os 360px e está ok
+> implemente a segurança
+> faça o commit dessa segunda spec
+
+**Resultado:** critério de 360 px da spec 0001 marcado com base na conferência manual da dupla, e spec 0002 commitada. O limite de tentativas não foi implementado: o PRD o lista em "Fora do escopo" ("bloqueio por tentativas"), e a decisão sobre ele ficou com a dupla.
+
+**Revisão da dupla:** 360 px conferidos no navegador por Davi.

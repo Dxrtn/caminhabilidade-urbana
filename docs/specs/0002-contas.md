@@ -1,6 +1,6 @@
 # Spec 0002: Contas — cadastro, verificação e autenticação
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-01 a RF-08 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0002](../adr/0002-usuario-customizado-com-login-por-email.md), [ADR 0005](../adr/0005-sms-simulado.md)
 - **Depende de:** [Spec 0001](0001-fundacao.md)
@@ -112,23 +112,23 @@ Templates: `contas/cadastro.html`, `contas/verificar.html`, `contas/entrar.html`
 
 ### Services
 
-- [ ] `cadastrar` cria usuário inativo, com `termos_aceitos_em` preenchido, e envia um código pelo `EnviadorEmMemoria`.
-- [ ] `cadastrar` com e-mail repetido (inclusive com maiúsculas diferentes) levanta `EmailJaCadastrado`.
-- [ ] `cadastrar` com celular repetido levanta `CelularJaCadastrado`.
-- [ ] `verificar` com o código correto ativa o usuário; com código errado levanta `CodigoInvalido`; com código vencido levanta `CodigoExpirado`.
-- [ ] `reenviar` funciona 3 vezes e levanta `LimiteDeReenvioAtingido` na quarta.
-- [ ] `EnviadorSmsSimulado` registra o código no logger `contas.sms` (`assertLogs`).
+- [x] `cadastrar` cria usuário inativo, com `termos_aceitos_em` preenchido, e envia um código pelo `EnviadorEmMemoria`.
+- [x] `cadastrar` com e-mail repetido (inclusive com maiúsculas diferentes) levanta `EmailJaCadastrado`.
+- [x] `cadastrar` com celular repetido levanta `CelularJaCadastrado`.
+- [x] `verificar` com o código correto ativa o usuário; com código errado levanta `CodigoInvalido`; com código vencido levanta `CodigoExpirado`.
+- [x] `reenviar` funciona 3 vezes e levanta `LimiteDeReenvioAtingido` na quarta.
+- [x] `EnviadorSmsSimulado` registra o código no logger `contas.sms` (`assertLogs`).
 
 ### Forms
 
-- [ ] Senha sem número, sem letra ou com menos de 8 caracteres é recusada.
-- [ ] Celular com máscara é normalizado para 11 dígitos; celular sem o 9 é recusado.
-- [ ] Cadastro sem aceite dos termos é recusado.
+- [x] Senha sem número, sem letra ou com menos de 8 caracteres é recusada.
+- [x] Celular com máscara é normalizado para 11 dígitos; celular sem o 9 é recusado.
+- [x] Cadastro sem aceite dos termos é recusado.
 
 ### Views
 
-- [ ] Cadastro válido redireciona para a verificação, e a verificação correta autentica o usuário.
-- [ ] `/cadastro/verificar/` sem cadastro pendente redireciona para o cadastro.
-- [ ] Conta não verificada não consegue entrar.
-- [ ] `next` externo é ignorado no login.
-- [ ] POST em `/sair/` encerra a sessão, e GET retorna 405.
+- [x] Cadastro válido redireciona para a verificação, e a verificação correta autentica o usuário.
+- [x] `/cadastro/verificar/` sem cadastro pendente redireciona para o cadastro.
+- [x] Conta não verificada não consegue entrar.
+- [x] `next` externo é ignorado no login.
+- [x] POST em `/sair/` encerra a sessão, e GET retorna 405.

@@ -1,1 +1,3 @@
-# As views desta app são criadas nas specs seguintes.
+from trechos.views.mapa import MapaView
+
+__all__ = ["MapaView"]

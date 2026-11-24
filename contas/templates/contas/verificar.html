@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Verificar celular — Caminhabilidade Urbana{% endblock %}
+
+{% block content %}
+  <h1>Verificar celular</h1>
+  <p>Digite o código de 6 números enviado para <strong>{{ celular_mascarado }}</strong>. Ele vale por 10 minutos.</p>
+
+  <form method="post" action="{% url 'contas:verificar' %}" class="formulario" novalidate>
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Verificar</button>
+  </form>
+
+  <form method="post" action="{% url 'contas:reenviar' %}" class="formulario formulario--secundario">
+    {% csrf_token %}
+    <p>Não recebeu?</p>
+    <button type="submit" class="botao--secundario">Reenviar código</button>
+  </form>
+{% endblock %}
