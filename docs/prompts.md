@@ -152,3 +152,32 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** critério de 360 px da spec 0001 marcado com base na conferência manual da dupla, e spec 0002 commitada. O limite de tentativas não foi implementado: o PRD o lista em "Fora do escopo" ("bloqueio por tentativas"), e a decisão sobre ele ficou com a dupla.
 
 **Revisão da dupla:** 360 px conferidos no navegador por Davi.
+
+### 007 — 2026-11-24 — Implementação da spec 0003 (modelo de dados)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0003
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0003-modelo-de-dados.md, seguindo docs/arquitetura.md
+> e as skills indicadas, principalmente .agents/skills/postgresql/SKILL.md.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+>
+> Atenção à ordem das migrações:
+> - a trigger (RunSQL em trechos) depende das tabelas trecho e historico_trecho;
+> - a view (RunSQL em feedbacks) depende das tabelas trecho, bairro e feedback;
+> - declare essas dependências explicitamente em cada migração.
+> Os nomes das colunas do model HistoricoTrecho precisam bater exatamente com o INSERT da trigger.
+>
+> Ao final:
+> 1. Rode python manage.py sqlmigrate para cada migração nova e me mostre uma tabela listando cada
+>    constraint, índice, trigger e view criados, com o nome real no banco e qual das 4 integridades
+>    (entidade, domínio, referencial, definida pelo usuário) cada constraint representa.
+> 2. Marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md.
+> 3. Me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** models de `trechos` (`Bairro`, `Obstaculo`, `Trecho`, `TrechoObstaculo`, `FotoTrecho`, `HistoricoTrecho`, `TrechoMapa`) e de `feedbacks` (`Feedback`, `FeedbackObstaculo`, `FotoFeedback`, `Notificacao`) com todas as constraints e índices da spec; migração de dados com 12 obstáculos e 49 bairros; trigger `trg_trecho_historico` e view `vw_trechos_mapa` em `RunSQL` com reversão e dependências explícitas; Admin somente leitura; 16 testes novos (50 no total). Desvios forçados pelo Django 6.1, documentados na spec e na ADR 0008 (proposta): `DO_NOTHING` no lugar de `PROTECT` (checks E050/E323) e índice `idx_trecho_bairro_classif` (limite de 30 caracteres, E034). Acrescentada `ck_feedback_motivo_rejeicao_valido`, exigida pela skill postgresql. Skills postgresql e django-boas-praticas atualizadas com essas regras.
+
+**Revisão da dupla:** ADR 0008 aceita por Davi.

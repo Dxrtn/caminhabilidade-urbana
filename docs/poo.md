@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 e 0002). Os demais caminhos ainda são planejados.
+Status: **em implementação**. Os itens marcados com ✔ já existem no código (specs 0001 a 0003). Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -20,7 +20,8 @@ Reaproveitar e especializar comportamento a partir de uma classe base.
 
 | Classe filha | Classe base | O que herda | Onde está |
 |---|---|---|---|
-| `Trecho`, `Feedback` | `ModeloComDatas` | Campos `criado_em` e `atualizado_em` | `trechos/models/`, `feedbacks/models/` |
+| `Trecho`, `Feedback` | `ModeloComDatas` | Campos `criado_em` e `atualizado_em`, sem repetir a declaração; a trigger e a view `vw_trechos_mapa` leem `trecho.atualizado_em` | `trechos/models/trecho.py` ✔, `feedbacks/models/feedback.py` ✔ |
+| `SomenteLeituraAdmin` e seus filhos (`TrechoAdmin`, `HistoricoTrechoAdmin`, `FeedbackAdmin` etc.) | `ModelAdmin` (Django) | A tela do Admin; a classe base sobrescreve `has_add_permission`, `has_change_permission` e `has_delete_permission` para negar a escrita, e as filhas só declaram as colunas | `comum/admin.py` ✔, `trechos/admin.py` ✔, `feedbacks/admin.py` ✔ |
 | `Usuario` | `AbstractUser` (Django) | Senha, permissões, `is_active`, `is_staff`. Especializa removendo `username`, `first_name` e `last_name`, usando o e-mail no login e sobrescrevendo `get_full_name()` e `get_short_name()`. O `UsuarioManager` herda de `BaseUserManager` e sobrescreve `create_user` e `create_superuser` | `contas/models/usuario.py` ✔ |
 | `EnviadorSmsSimulado`, `EnviadorEmMemoria` | `EnviadorDeCodigo` | O contrato `enviar()`, que cada uma implementa do seu jeito. `EnviadorEmMemoria` também tem o atributo de classe `enviados` e o método de classe `limpar()` | `contas/services/enviadores.py` ✔ |
 | `ImportadorDadosExemplo`, `ImportadorCsv` | `ImportadorDeTrechos` | O algoritmo completo de `importar()` | `trechos/services/importadores.py` |
@@ -51,5 +52,6 @@ Proteger o estado e as regras, expondo só uma interface pública.
 | `ImportadorDeTrechos._administrador` | Atributo protegido, definido no construtor e usado só pela própria classe e subclasses |
 | Métodos auxiliares com `_` | Ex.: `VerificacaoService._gerar_codigo()` ✔ e `CadastroService._garantir_disponivel()` ✔, de uso interno do service; `_distancia_ate_trecho()` (planejado) |
 | Exceções de domínio | O service comunica falhas sem expor detalhes do banco. Em `CadastroService.cadastrar` ✔, o `IntegrityError` de um cadastro simultâneo vira `EmailJaCadastrado` ou `CelularJaCadastrado`; no feedback, vira `FeedbackEmAnaliseExistente` (planejado) |
-| `HistoricoTrecho` | Só a trigger do banco grava; o código não tem como alterar o histórico |
+| `HistoricoTrecho` ✔ | Só a trigger `trg_trecho_historico` grava (`trechos/migrations/0003_trigger_historico_trecho.py`); no Admin é somente leitura, e nenhum service escreve nela |
+| `TrechoMapa` ✔ | Lê a view `vw_trechos_mapa` com `managed = False`; `save()` e `delete()` são sobrescritos para levantar `NotSupportedError`, então o objeto não pode ser gravado (`trechos/models/trecho_mapa.py`) |
 | `DadosTrecho` (`frozen=True`) | Objeto de dados imutável: depois de criado, não pode ser alterado |

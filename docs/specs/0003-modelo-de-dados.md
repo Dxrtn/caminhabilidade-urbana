@@ -1,8 +1,8 @@
 # Spec 0003: Modelo de dados de trechos e feedbacks
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RF-10, RF-21, RF-29 e RNF-05 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md); base para RF-09 a RF-34
-- **Decisões:** [ADR 0004](../adr/0004-postgresql-como-banco-de-dados.md), [ADR 0006](../adr/0006-mapa-com-leaflet-e-openstreetmap.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md)
+- **Decisões:** [ADR 0004](../adr/0004-postgresql-como-banco-de-dados.md), [ADR 0006](../adr/0006-mapa-com-leaflet-e-openstreetmap.md), [ADR 0007](../adr/0007-regras-de-integridade-no-banco.md), [ADR 0008](../adr/0008-do-nothing-no-lugar-de-protect.md)
 - **Depende de:** [Spec 0001](0001-fundacao.md)
 
 Esta spec cria apenas a camada de dados: models, constraints, índices, dados de referência, trigger e view. Services, telas e regras de uso vêm nas specs seguintes. Leia antes a [skill postgresql](../../.agents/skills/postgresql/SKILL.md).
@@ -62,7 +62,7 @@ Limites de Maceió, usados nas constraints de coordenadas: latitude entre -9.80 
 | Campo | Tipo | Regras |
 |---|---|---|
 | `logradouro` | `CharField(max_length=150)` | Obrigatório |
-| `bairro` | `ForeignKey(Bairro, on_delete=PROTECT, related_name="trechos")` | Obrigatório |
+| `bairro` | `ForeignKey(Bairro, on_delete=DO_NOTHING, related_name="trechos")` | Obrigatório. `DO_NOTHING` deixa o banco com `NO ACTION`, que impede excluir um bairro em uso ([ADR 0008](../adr/0008-do-nothing-no-lugar-de-protect.md)) |
 | `referencia_inicio` | `CharField(max_length=150)` | Ex.: "Esquina com a Rua A" |
 | `referencia_fim` | `CharField(max_length=150)` | |
 | `lado` | `CharField(max_length=5)` com `Lado` | |
@@ -84,13 +84,13 @@ Constraints:
 | `ck_trecho_observacoes_tamanho` | Domínio | `observacoes` com até 500 caracteres |
 | `uq_trecho_logradouro_referencias_lado` | Entidade | Únicos juntos: `logradouro`, `referencia_inicio`, `referencia_fim`, `lado` |
 
-Índice: `idx_trecho_bairro_classificacao` em (`bairro`, `classificacao`), para os filtros do mapa e da gestão.
+Índice: `idx_trecho_bairro_classif` em (`bairro`, `classificacao`), para os filtros do mapa e da gestão. O nome é abreviado porque o Django limita nomes de índice a 30 caracteres (check `models.E034`).
 
 `__str__`: `"{logradouro} ({referencia_inicio} → {referencia_fim})"`.
 
 ### `TrechoObstaculo` — tabela `trecho_obstaculo`
 
-`trecho` (`DB_CASCADE`) e `obstaculo` (`PROTECT`), com `uq_trecho_obstaculo` em (`trecho`, `obstaculo`).
+`trecho` (`DB_CASCADE`) e `obstaculo` (`DO_NOTHING`), com `uq_trecho_obstaculo` em (`trecho`, `obstaculo`).
 
 ### `FotoTrecho` — tabela `foto_trecho`
 
@@ -140,7 +140,7 @@ class MotivoRejeicao(models.TextChoices):
 | Campo | Tipo | Regras |
 |---|---|---|
 | `usuario` | `ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DB_SET_NULL, null=True, related_name="feedbacks")` | Nulo apenas se a conta for removida, mantendo o relato anônimo |
-| `trecho` | `ForeignKey(Trecho, on_delete=PROTECT, related_name="feedbacks")` | |
+| `trecho` | `ForeignKey(Trecho, on_delete=DO_NOTHING, related_name="feedbacks")` | `NO ACTION` no banco: trecho com feedback não pode ser excluído |
 | `tipo` | `CharField(max_length=25)` com `TipoFeedback` | |
 | `classificacao_sugerida` | `CharField(max_length=15, null=True, blank=True)` com `Classificacao` | |
 | `descricao` | `TextField` | 10 a 500 caracteres |
@@ -159,6 +159,7 @@ Constraints:
 | `ck_feedback_tipo_valido` | Domínio | `tipo` dentro das opções |
 | `ck_feedback_status_valido` | Domínio | `status` dentro das opções |
 | `ck_feedback_classificacao_sugerida_valida` | Domínio | Nula ou uma de `ACESSIVEL`, `PARCIAL`, `INACESSIVEL` |
+| `ck_feedback_motivo_rejeicao_valido` | Domínio | Nulo ou dentro das opções de `MotivoRejeicao` (exigido pela skill postgresql para todo campo com `choices`) |
 | `ck_feedback_descricao_tamanho` | Domínio | Descrição com 10 a 500 caracteres |
 | `ck_feedback_rejeicao_exige_motivo` | Definida pelo usuário | `status = REJEITADO` se e somente se `motivo_rejeicao` não for nulo |
 | `ck_feedback_motivo_outro_exige_texto` | Definida pelo usuário | `motivo_rejeicao = OUTRO` exige `motivo_rejeicao_texto` não vazio |
@@ -169,7 +170,7 @@ Constraints:
 
 ### `FeedbackObstaculo` — tabela `feedback_obstaculo`
 
-`feedback` (`DB_CASCADE`) e `obstaculo` (`PROTECT`), com `uq_feedback_obstaculo`.
+`feedback` (`DB_CASCADE`) e `obstaculo` (`DO_NOTHING`), com `uq_feedback_obstaculo`.
 
 ### `FotoFeedback` — tabela `foto_feedback`
 
@@ -253,15 +254,15 @@ O model `TrechoMapa` fica em `trechos/models/`, mas sua migração (`CreateModel
 
 ## Admin
 
-Todos os models registrados somente leitura (`has_add_permission`, `has_change_permission` e `has_delete_permission` retornam `False`), exceto `Bairro` e `Obstaculo`, que podem ser editados.
+Todos os models registrados somente leitura (`has_add_permission`, `has_change_permission` e `has_delete_permission` retornam `False`), exceto `Bairro` e `Obstaculo`, que podem ser criados e editados, mas não excluídos: com `DO_NOTHING`, excluir um registro em uso só falharia no banco.
 
 ## Testes
 
-- [ ] A migração de dados cria os 12 obstáculos e os bairros.
-- [ ] O banco rejeita (`IntegrityError`): classificação inválida, coordenada fora de Maceió, início igual ao fim e trecho duplicado.
-- [ ] O banco rejeita: feedback rejeitado sem motivo, motivo `OUTRO` sem texto, feedback aceito sem `analisado_em`, descrição com menos de 10 caracteres.
-- [ ] O banco rejeita um segundo feedback `EM_ANALISE` do mesmo usuário no mesmo trecho, mas aceita depois que o primeiro é aceito ou rejeitado.
-- [ ] A trigger grava uma linha no histórico ao criar o trecho (com anterior nulo) e outra ao mudar a classificação, com `alterado_por`.
-- [ ] A trigger **não** grava histórico quando outro campo muda e a classificação continua a mesma.
-- [ ] `TrechoMapa` lista apenas trechos ativos e conta só os feedbacks em análise.
-- [ ] Excluir um trecho no banco exclui suas fotos, obstáculos e histórico (`ON DELETE CASCADE`), mas é bloqueado se ele tiver feedbacks.
+- [x] A migração de dados cria os 12 obstáculos e os bairros.
+- [x] O banco rejeita (`IntegrityError`): classificação inválida, coordenada fora de Maceió, início igual ao fim e trecho duplicado.
+- [x] O banco rejeita: feedback rejeitado sem motivo, motivo `OUTRO` sem texto, feedback aceito sem `analisado_em`, descrição com menos de 10 caracteres.
+- [x] O banco rejeita um segundo feedback `EM_ANALISE` do mesmo usuário no mesmo trecho, mas aceita depois que o primeiro é aceito ou rejeitado.
+- [x] A trigger grava uma linha no histórico ao criar o trecho (com anterior nulo) e outra ao mudar a classificação, com `alterado_por`.
+- [x] A trigger **não** grava histórico quando outro campo muda e a classificação continua a mesma.
+- [x] `TrechoMapa` lista apenas trechos ativos e conta só os feedbacks em análise.
+- [x] Excluir um trecho no banco exclui suas fotos, obstáculos e histórico (`ON DELETE CASCADE`), mas é bloqueado se ele tiver feedbacks.

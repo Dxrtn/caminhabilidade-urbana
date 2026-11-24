@@ -42,7 +42,7 @@ class PostCreateView(LoginRequiredMixin, View):
 - Mantenha nos models apenas campos, relacionamentos, constraints, índices, `Meta` e `__str__`.
 - Proteja invariantes no banco com `UniqueConstraint` e `CheckConstraint`.
 - Referencie o usuário com `settings.AUTH_USER_MODEL` em models e com `get_user_model()` no restante do código.
-- Escolha `on_delete` conscientemente. Use `PROTECT` quando a exclusão perderia dados importantes.
+- Escolha `on_delete` conscientemente. Quando a exclusão perderia dados importantes, impeça-a com `DO_NOTHING`, que deixa o banco com `NO ACTION`; neste projeto, não use `PROTECT` (veja a skill postgresql e a [ADR 0008](../../../docs/adr/0008-do-nothing-no-lugar-de-protect.md)).
 - Use `TextChoices` para valores fixos.
 - Use `null=True` em campos de texto só quando houver motivo: normalmente basta `blank=True`.
 - Gere migrações com `makemigrations`, revise o arquivo e versione-o. Não edite migrações já aplicadas em outros ambientes.
