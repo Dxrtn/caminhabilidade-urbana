@@ -1,0 +1,70 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Caminhabilidade Urbana{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  {% comment %}
+    As rotas usam {% url ... as var %}: se a rota ainda não existir (specs futuras),
+    a variável fica vazia e o item não aparece, em vez de quebrar a página.
+  {% endcomment %}
+  {% url 'trechos:mapa' as url_mapa %}
+  {% url 'contas:entrar' as url_entrar %}
+  {% url 'contas:cadastro' as url_cadastro %}
+  {% url 'contas:sair' as url_sair %}
+  {% url 'feedbacks:meus' as url_meus_feedbacks %}
+  {% url 'trechos:painel' as url_painel %}
+
+  <header class="cabecalho">
+    <div class="cabecalho__barra">
+      {% if url_mapa %}
+        <a class="cabecalho__marca" href="{{ url_mapa }}">Caminhabilidade Urbana</a>
+      {% else %}
+        <span class="cabecalho__marca">Caminhabilidade Urbana</span>
+      {% endif %}
+
+      <details class="menu">
+        <summary class="menu__botao">Menu</summary>
+        <nav class="menu__itens" aria-label="Menu principal">
+          <ul>
+            {% if url_mapa %}<li><a href="{{ url_mapa }}">Mapa</a></li>{% endif %}
+            {% if user.is_authenticated %}
+              {% if url_meus_feedbacks %}<li><a href="{{ url_meus_feedbacks }}">Meus feedbacks</a></li>{% endif %}
+              {% if user.is_staff and url_painel %}<li><a href="{{ url_painel }}">Painel</a></li>{% endif %}
+              {% if url_sair %}
+                <li>
+                  <form method="post" action="{{ url_sair }}">
+                    {% csrf_token %}
+                    <button type="submit" class="menu__sair">Sair</button>
+                  </form>
+                </li>
+              {% endif %}
+            {% else %}
+              {% if url_entrar %}<li><a href="{{ url_entrar }}">Entrar</a></li>{% endif %}
+              {% if url_cadastro %}<li><a href="{{ url_cadastro }}">Criar conta</a></li>{% endif %}
+            {% endif %}
+          </ul>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <div class="mensagens" role="status">
+    {% for mensagem in messages %}
+      <p class="mensagem{% if mensagem.tags %} mensagem--{{ mensagem.tags }}{% endif %}">{{ mensagem }}</p>
+    {% endfor %}
+  </div>
+
+  <main id="conteudo" class="conteudo" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

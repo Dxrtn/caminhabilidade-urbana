@@ -1,6 +1,6 @@
 # Spec 0001: Fundação do projeto
 
-- **Status:** Proposto
+- **Status:** Implementado
 - **Requisitos:** RNF-01, RNF-02, RNF-03, RNF-04 e RNF-07 do [PRD 0001](../prd/0001-caminhabilidade-urbana.md)
 - **Decisões:** [ADR 0001](../adr/0001-mvt-com-camada-de-service.md), [ADR 0002](../adr/0002-usuario-customizado-com-login-por-email.md), [ADR 0003](../adr/0003-site-web-responsivo.md), [ADR 0004](../adr/0004-postgresql-como-banco-de-dados.md)
 
@@ -145,15 +145,15 @@ Percorre os módulos de `contas.views`, `trechos.views` e `feedbacks.views` e fa
 
 ## Testes
 
-- [ ] `distancia_em_metros` retorna 0 para o mesmo ponto e cerca de 111 km para 1 grau de latitude.
-- [ ] `AdministradorRequeridoMixin`: visitante é redirecionado ao login, usuário comum recebe 403 e administrador acessa.
-- [ ] `create_user` cria usuário inativo e não verificado; `create_superuser` cria ativo e verificado.
-- [ ] O banco rejeita celular fora do formato e usuário ativo sem celular verificado (`IntegrityError`).
-- [ ] O teste de arquitetura passa.
+- [x] `distancia_em_metros` retorna 0 para o mesmo ponto e cerca de 111 km para 1 grau de latitude.
+- [x] `AdministradorRequeridoMixin`: visitante é redirecionado ao login, usuário comum recebe 403 e administrador acessa.
+- [x] `create_user` cria usuário inativo e não verificado; `create_superuser` cria ativo e verificado.
+- [x] O banco rejeita celular fora do formato e usuário ativo sem celular verificado (`IntegrityError`).
+- [x] O teste de arquitetura passa.
 
 ## Critérios de aceite
 
-- [ ] `python manage.py check` não reporta problemas.
-- [ ] `python manage.py migrate` executa no PostgreSQL usando `contas.Usuario`.
-- [ ] `python manage.py createsuperuser` funciona pedindo e-mail, nome completo e celular.
+- [x] `python manage.py check` não reporta problemas.
+- [x] `python manage.py migrate` executa no PostgreSQL usando `contas.Usuario`.
+- [x] `python manage.py createsuperuser` funciona pedindo e-mail, nome completo e celular.
 - [ ] A página base abre em 360 px de largura sem rolagem horizontal.

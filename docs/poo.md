@@ -2,7 +2,7 @@
 
 Este arquivo mapeia onde cada pilar da orientação a objetos aparece no código. Ele guia a implementação e serve de roteiro para a apresentação. A IA atualiza a coluna "Onde está" sempre que criar ou alterar uma dessas classes (regra do `AGENTS.md`).
 
-Status: **planejado**. Os caminhos serão confirmados durante a implementação.
+Status: **em implementação**. Confirmados até a spec 0001 (marcados com ✔): `ModeloComDatas`, `Usuario` e `AdministradorRequeridoMixin`. Os demais caminhos ainda são planejados.
 
 ## Abstração
 
@@ -12,7 +12,7 @@ Esconder os detalhes e expor só o que importa, por meio de classes abstratas qu
 |---|---|---|---|
 | `EnviadorDeCodigo` (ABC) | "Enviar um código para um celular", sem dizer como | `contas/services/enviadores.py` | [0002](specs/0002-contas.md) |
 | `ImportadorDeTrechos` (ABC) | "Importar trechos de uma origem", sem dizer qual | `trechos/services/importadores.py` | [0004](specs/0004-gestao-de-trechos.md) |
-| `ModeloComDatas` (abstract model) | Datas de criação e atualização de qualquer registro | `comum/models/base.py` | [0001](specs/0001-fundacao.md) |
+| `ModeloComDatas` (abstract model) | Datas de criação e atualização de qualquer registro. Com `Meta.abstract = True`, não gera tabela: só empresta os campos às filhas | `comum/models/base.py` ✔ | [0001](specs/0001-fundacao.md) |
 
 ## Herança
 
@@ -21,10 +21,10 @@ Reaproveitar e especializar comportamento a partir de uma classe base.
 | Classe filha | Classe base | O que herda | Onde está |
 |---|---|---|---|
 | `Trecho`, `Feedback` | `ModeloComDatas` | Campos `criado_em` e `atualizado_em` | `trechos/models/`, `feedbacks/models/` |
-| `Usuario` | `AbstractUser` (Django) | Senha, permissões, `is_active`, `is_staff` | `contas/models/usuario.py` |
+| `Usuario` | `AbstractUser` (Django) | Senha, permissões, `is_active`, `is_staff`. Especializa removendo `username`, `first_name` e `last_name`, usando o e-mail no login e sobrescrevendo `get_full_name()` e `get_short_name()`. O `UsuarioManager` herda de `BaseUserManager` e sobrescreve `create_user` e `create_superuser` | `contas/models/usuario.py` ✔ |
 | `EnviadorSmsSimulado`, `EnviadorEmMemoria` | `EnviadorDeCodigo` | O contrato `enviar()` | `contas/services/enviadores.py` |
 | `ImportadorDadosExemplo`, `ImportadorCsv` | `ImportadorDeTrechos` | O algoritmo completo de `importar()` | `trechos/services/importadores.py` |
-| `AdministradorRequeridoMixin` | `LoginRequiredMixin` e `UserPassesTestMixin` | Herança múltipla: exige login **e** `is_staff` | `comum/mixins.py` |
+| `AdministradorRequeridoMixin` | `LoginRequiredMixin` e `UserPassesTestMixin` | Herança múltipla: exige login **e** `is_staff`. Sobrescreve só `test_func()`; pela ordem de resolução (MRO), o login é verificado primeiro | `comum/mixins.py` ✔ |
 | Todas as views | `django.views.View` | O despacho por método HTTP | `*/views/` |
 | Exceções de domínio | `ContaErro`, `TrechoErro`, `FeedbackErro` | Hierarquia de erros por app | `*/exceptions.py` |
 

@@ -9,7 +9,7 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 | Etapa | Ferramenta | Modelo |
 |---|---|---|
 | Planejamento e documentação inicial (PRD, ADRs, specs, skills) | Claude (claude.ai) | Claude Opus 5.5 |
-| Implementação | *(preencher: ex.: Claude Code, GitHub Copilot)* | *(preencher)* |
+| Implementação | Claude Code (extensão do VS Code) | Claude Opus 5.5 |
 
 ## Modelo de entrada
 
@@ -82,3 +82,34 @@ Exigido pela disciplina de Laboratório de Banco de Dados: "informar qual o mode
 **Resultado:** `AGENTS.md`, PRD 0001, `arquitetura.md`, 7 ADRs, 8 specs, `poo.md`, skill `postgresql`, `banco/01_criar_banco.sql` e README com o roteiro de implementação. As skills do repositório-modelo foram mantidas.
 
 **Revisão da dupla:** *(preencher depois de ler o PRD e as specs)*
+
+### 003 — 2026-11-24 — Implementação da spec 0001 (fundação)
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** 0001
+
+**Prompt:**
+
+> Leia o AGENTS.md e implemente a spec docs/specs/0001-fundacao.md, seguindo docs/arquitetura.md e as skills indicadas.
+> Implemente apenas esta spec. Escreva os testes listados nela e rode python manage.py test até passar.
+> Ao final, marque os testes cumpridos e o status da spec, atualize docs/state.md, docs/poo.md e docs/prompts.md,
+> e me mostre um resumo do que foi criado, arquivo por arquivo, explicando as decisões principais.
+
+**Resultado:** projeto `core` e apps `comum`, `contas`, `trechos` e `feedbacks` em pacotes; `settings.py` lendo o `.env`; `ModeloComDatas`, `AdministradorRequeridoMixin`, `distancia_em_metros`; model `contas.Usuario` com as quatro `CHECK` no banco (migração `contas/0001_initial`) e Admin ajustado; `templates/base.html` e `static/css/site.css` pensados primeiro para celular; 13 testes, incluindo o teste de arquitetura, passando no PostgreSQL. Ajustes além do texto da spec: `is_active` com padrão falso, remoção de `first_name`/`last_name` e validadores nos campos `celular` e `nome_completo` (para o `createsuperuser` recusar dados inválidos com mensagem).
+
+**Revisão da dupla:** *(preencher)*
+
+### 004 — 2026-11-24 — Caminho das skills
+
+- **Ferramenta / modelo:** Claude Code (extensão do VS Code) / Claude Opus 5.5
+- **Quem pediu:** Davi
+- **Spec:** —
+
+**Prompt:**
+
+> corrija os caminhos para as skills estarem dentro dos agents
+
+**Resultado:** pasta `skills/` movida para `.agents/skills/` (com `git mv`), o caminho que o `AGENTS.md` e as specs já usavam. Removido da skill `seguranca-owasp` um link para uma ADR do repositório-modelo que não existe neste projeto.
+
+**Revisão da dupla:** *(preencher)*

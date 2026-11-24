@@ -1,0 +1,240 @@
+/* Caminhabilidade Urbana — estilos do site.
+   Escrito primeiro para celular (a partir de 360 px); telas maiores via min-width. */
+
+:root {
+  /* Cores das classificações, reaproveitadas no mapa (spec 0005). */
+  --cor-acessivel: #1b7f3b;
+  --cor-parcial: #9a6700;
+  --cor-inacessivel: #c62828;
+  --cor-sem-avaliacao: #6b6b6b;
+
+  --cor-texto: #1a1a1a;
+  --cor-fundo: #ffffff;
+  --cor-superficie: #f4f5f7;
+  --cor-borda: #c9ccd1;
+  --cor-primaria: #0b4f8a;
+  --cor-foco: #ffbf47;
+  --cor-sucesso-fundo: #e6f4ea;
+  --cor-erro-fundo: #fdecea;
+
+  --toque-minimo: 44px;
+  --espaco: 1rem;
+  --largura-maxima: 64rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  overflow-wrap: break-word;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--cor-primaria);
+}
+
+/* Foco sempre visível para navegação por teclado. */
+:focus-visible {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
+/* Áreas de toque mínimas de 44 × 44 px. */
+button,
+.botao,
+input[type="submit"],
+summary {
+  min-height: var(--toque-minimo);
+  min-width: var(--toque-minimo);
+  font: inherit;
+  cursor: pointer;
+}
+
+.botao,
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--cor-primaria);
+  border-radius: 0.375rem;
+  background: var(--cor-primaria);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* Link "Pular para o conteúdo": aparece só ao receber foco. */
+.pular-conteudo {
+  position: absolute;
+  left: var(--espaco);
+  top: -100px;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  background: var(--cor-fundo);
+  border: 2px solid var(--cor-primaria);
+}
+
+.pular-conteudo:focus {
+  top: var(--espaco);
+}
+
+/* Cabeçalho */
+.cabecalho {
+  background: var(--cor-primaria);
+  color: #ffffff;
+}
+
+.cabecalho__barra {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco);
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: 0.25rem var(--espaco);
+}
+
+.cabecalho__marca {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-minimo);
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Menu: no celular é um botão que abre a lista (details/summary). */
+.menu__botao {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 1rem;
+  border: 1px solid #ffffff;
+  border-radius: 0.375rem;
+  list-style: none;
+}
+
+.menu__botao::-webkit-details-marker {
+  display: none;
+}
+
+.menu__itens {
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: 100%;
+  z-index: 900;
+  background: var(--cor-primaria);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.menu__itens ul {
+  margin: 0;
+  padding: 0.5rem var(--espaco);
+  list-style: none;
+}
+
+.menu__itens a,
+.menu__sair {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--toque-minimo);
+  padding: 0 0.5rem;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.menu__sair {
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+}
+
+.menu__itens form {
+  margin: 0;
+}
+
+/* Mensagens do framework */
+.mensagens {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: 0 var(--espaco);
+}
+
+.mensagem {
+  margin: var(--espaco) 0 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--cor-primaria);
+  background: var(--cor-superficie);
+}
+
+.mensagem--success {
+  border-color: var(--cor-acessivel);
+  background: var(--cor-sucesso-fundo);
+}
+
+.mensagem--error {
+  border-color: var(--cor-inacessivel);
+  background: var(--cor-erro-fundo);
+}
+
+/* Conteúdo */
+.conteudo {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: var(--espaco);
+}
+
+/* Telas a partir de 768 px: o menu vira uma barra horizontal sempre visível.
+   Só onde o navegador permite exibir o conteúdo de um details fechado;
+   nos demais, o botão "Menu" continua funcionando. */
+@supports selector(::details-content) {
+@media (min-width: 768px) {
+  .menu__botao {
+    display: none;
+  }
+
+  .menu::details-content {
+    content-visibility: visible;
+    display: contents;
+  }
+
+  .menu__itens {
+    position: static;
+    border: 0;
+  }
+
+  .menu__itens ul {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0;
+  }
+
+  .menu__itens a,
+  .menu__sair {
+    width: auto;
+    padding: 0 0.75rem;
+  }
+}
+}
